@@ -70,7 +70,146 @@ RESULT:
 TypeError: Cannot delete property 'prototype' of function Object() { [native code] }
 ```
 
-## Lesson 2
+## Lesson 2 Modern JavaScript: Let
+
+Early in JavaScript's life, local variables were declared with the var keyword. When we define a var inside a function, it's only visible inside the function. We're allowed to use var in strict mode.
+
+1.
+```js
+function defineX() {
+  var x = 1;
+  return 'ok';
+}
+defineX();
+RESULT:
+'ok'
+```
+
+However, trying to reference the variable outside of the function is an error.
+
+Reference x outside of the function, which will cause an error. (console.log(x) is a fine choice.)
+
+
+2.
+```js
+function defineX() {
+  var x = 1;
+}
+defineX();
+console.log(x);
+GOAL:
+ReferenceError: x is not defined
+YOURS:
+ReferenceError: x is not defined
+```
+
+Functions create a variable scope. Inside the function, variables defined in the function are visible. Outside the function, the function's variables are invisible. This is good!
+
+All vars are "function-scoped", which means that they're visible to the entire function body. What if we put a var inside an if (...) { ... }? It seems like the variable should be visible inside the if block, which it is:
+
+3.
+```js 
+function f() {
+  if (true) {
+    var x = 1;
+    return x;
+  }
+}
+f();
+RESULT:
+1
+```
+
+However, the variable is also visible to the rest of the function body, even outside of the if block!
+
+Modify the function to return x.
+
+4.
+```js
+function f() {
+  if (true) {
+    var x = 1;
+  }
+  return x;
+}
+f();
+GOAL:
+1
+YOURS:
+1
+```
+
+This was a mistake in JavaScript's design: var x = 1 inside an if shouldn't be visible outside the if. It's too easy to declare a variable, thinking that it will be local to the if, then accidentally use it later in the function.
+
+Fortunately, this problem was fixed in 2015, when let was introduced. With let, a variable defined inside the if isn't visible outside the if. Trying to access it will cause an error. (You can type error when a code example will throw an error.)
+
+
+5.
+```js
+function f() {
+  if (true) {
+    let x = 1;
+  }
+  return x;
+}
+f();
+RESULT:
+ReferenceError: x is not defined
+```
+
+let handles nested scopes properly. For example, we can define an x in the function body, then define another x inside an if. Changing the "inner" x won't change the "outer" x.
+
+
+6.
+```js
+
+function f() {
+  let x = 'outer';
+  if (true) {
+    let x = 'inner';
+  }
+  return x;
+}
+f();
+RESULT:
+'outer'
+```
+
+Those variables hold different values even though they have the same name. That's called "shadowing": the inner let x shadows the outer let x.
+
+We've been using if for our examples, but these rules apply to any block of code in { curly braces }. For example, an outer scope can't access a variable defined inside a while; that causes an error.
+
+7.
+```js
+function f() {
+  let iterating = true;
+  while (iterating) {
+    let x = 1;
+    iterating = false;
+  }
+  return x;
+}
+f();
+RESULT:
+ReferenceError: x is not defined
+```
+
+We can also introduce new scopes without using a construct like if or while. Any code contained in { curly braces } will have its own scope.
+
+
+8.
+```js
+function f() {
+  let x = 'outer';
+  {
+    let x = 'inner';
+  }
+  return x;
+}
+f();
+RESULT:
+'outer'
+```
 
 ## Lesson 3
 
