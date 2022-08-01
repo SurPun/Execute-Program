@@ -211,7 +211,120 @@ RESULT:
 'outer'
 ```
 
-## Lesson 3
+## Lesson 3 Modern JavaScript: Const
+
+Sometimes we want to define a variable and ensure that it won't change. We can do that with const, which is like let except that a const variable can never be reassigned. If we try to assign a new value to it, that's an error. (You can type error when a code example will throw an error.)
+
+1.
+```js
+function f() {
+  const x = 1;
+  return x;
+}
+f();
+RESULT:
+1
+```
+
+2.
+```js
+function f() {
+  const x = 1;
+  x = 2;
+  return x;
+}
+f();
+RESULT:
+TypeError: Assignment to constant variable.
+```
+
+3.
+```js
+function f() {
+  const x = 1;
+  x = 2;
+  return x;
+}
+f();
+GOAL:
+TypeError: Assignment to constant variable.
+YOURS:
+TypeError: Assignment to constant variable.
+```
+
+const doesn't stop us from mutating (changing) the value held by the variable. For example, we can mutate a const array by calling its push method. However, reassigning the array variable to hold a new array isn't allowed.
+
+Use xs.push(...) to push a 3 onto the array. That's allowed even though we declared xs with const.
+
+4.
+```js
+function f() {
+  const xs = [1, 2];
+xs.push(3);
+  xs.push(3);
+  return xs;
+}
+f();
+GOAL:
+[1, 2, 3]
+YOURS:
+[1, 2, 3]
+```
+
+Assign a new value to xs by doing xs = /* some value here */. That will cause an error because xs is const.
+
+5.
+```js
+function f() {
+  const xs = [1, 2];
+xs = 1;
+  xs = 1;
+  return xs;
+}
+f();
+GOAL:
+TypeError: Assignment to constant variable.
+YOURS:
+TypeError: Assignment to constant variable.
+```
+
+The short version is: const applies to the variable, not the value held by the variable.
+
+6.
+```js
+const x = 'first'
+const x = 'second'
+RESULT:
+SyntaxError: on line 2: Identifier 'x' has already been declared.
+```
+
+However, we can shadow const variables, like we can with let.
+
+7.
+```js
+function f() {
+  const x = 'outer';
+  {
+    const x = 'inner';
+  }
+  return x;
+}
+f();
+RESULT:
+'outer'
+```
+
+We didn't define a duplicate variable there; instead, we defined the same variable name in two different scopes. That's allowed, just like we're allowed to define the same variable name in two different functions.
+
+Variable scoping isn't exactly the bleeding edge of programming language research. But we declare, use, and think about variables more than almost anything else! It's important for it to be right.
+
+Prior to 2015, JavaScript's variable situation was a minefield that made errors easy. Today, the minefield is still there: var is still part of the language and it won't be going away. But we can forget about that old world by fully switching to let and const.
+
+(The computer can help you remember to use let. You can configure your linter to disallow var completely. If you like, it can also force you to use const for variables that are never reassigned. We recommend both.)
+
+let and const nicely encapsulate the goals of ECMAScript 5, ECMAScript 2015, and new versions. (ECMAScript is another name for JavaScript; it's primarily used when talking about the official language specification documents. We'll rarely mention specific ECMAScript versions in this course. Those standards are all finalized now, so we can think of them all as just being JavaScript.)
+
+let and const aren't flashy, and they won't make a web app twice as fast. But they fixed a twenty-year-old design mistake in JavaScript, and have made the language more suitable for large-scale application development. That's what ECMAScript 2015 and beyond have been about: modernizing the language, fixing the mistakes.
 
 ## Lesson 4
 
