@@ -590,9 +590,327 @@ There is one important difference between the two examples above. In the templat
 
 There are ways to remove that leading whitespace, like the dedent NPM module. But sometimes the whitespace doesn't matter. For example: in most cases, whitespace between HTML tags won't cause any problems, so we can leave it in.
 
-## Lesson 6
+## Lesson 6 Modern JavaScript: Rest parameters
 
-## Lesson 7
+JavaScript allows functions to take a variable number of parameters. In recent versions of JavaScript, we can do that by adding ... to the parameter list. The arguments will show up in a single array, regardless of how many arguments there were.
+
+```js
+function f(...args) {
+  return args;
+}
+f('a', 'b');
+RESULT:
+['a', 'b']
+```
+
+1.
+```js
+function f(...args) {
+  return args;
+}
+f(1, 2, 3);
+RESULT:
+[1, 2, 3]
+```
+
+In JavaScript, this feature is called "rest parameters" because it collects "the rest" of the function's parameters into an array. In other languages, you may see it called "varargs", which stands for "VARiable number of ARGuments".
+
+2.
+```js
+function max(...numbers) {
+  let max = numbers[0];
+  for (const n of numbers) {
+     if (n > max) {
+       max = n;
+     }
+  }
+  return max;
+}
+max(1, 2, 3);
+RESULT:
+3
+```
+
+Write a function sum that sums numbers. It should take the numbers as rest parameters. If no arguments are given, it should return 0.
+
+3.
+```js
+function sum(...num) {
+  let sum = 0;
+  for (const n of num) {
+    sum += n;
+  }
+  return sum;
+}
+const sums = [sum(), sum(100), sum(2000, 1), sum(-500, -300)];
+sums;
+GOAL:
+[0, 100, 2001, -800]
+YOURS:
+[0, 100, 2001, -800]
+
+```
+
+Rest parameters can be used after regular positional parameters.
+
+4.
+```js
+
+function addMany(toAdd, ...numbers) {
+  const result = [];
+  for (const n of numbers) {
+    result.push(n + toAdd);
+  }
+  return result;
+}
+addMany(2, 1, 7.7, 1000);
+RESULT:
+[3, 9.7, 1002]
+```
+
+However, positional parameters can't be used after rest parameters. Trying to do that is an error! (You can type error when a code example will throw an error.)
+
+5.
+```js
+function addMany(...numbers, toAdd) {
+  const result = [];
+  for (const n of numbers) {
+    result.push(n + toAdd);
+  }
+  return result;
+}
+addMany(1, 7.7, 1000, 2);
+RESULT:
+SyntaxError: on line 1: Rest element must be last element.
+```
+
+We also can't have multiple rest parameters. Trying to do that also produces an error. (The JavaScript virtual machine would have no way to know which argument values go in which rest parameter.)
+
+6.
+```js
+function multiplyArrays(...numbers1, ...numbers2) {
+  const result = []
+  for (let i = 0; i < numbers1.length; i++) {
+    result.push(numbers1[i] * numbers2[i])
+  }
+  return result
+}
+multiplyArrays(1, 2, 3, 4)
+RESULT:
+SyntaxError: on line 1: Rest element must be last element.
+```
+
+So far we've seen rest parameters in function definitions. They also work when calling a function. When we call f(...args), it means "pass the elements of the args array as separate parameters."
+
+7.
+```js
+function add(x, y) {
+  return x + y;
+}
+const numbers = [1, 2];
+add(...numbers);
+RESULT:
+3
+```
+
+## Lesson 7 Modern JavaScript: Basic array destructuring
+
+Historically, working with arrays and objects was clunky in JavaScript. For example, suppose that we want to extract the first three elements of an array into separate variables:
+
+1.
+```js
+const letters = ['a', 'b', 'c', 'd'];
+const a = letters[0], b = letters[1], c = letters[2];
+[a, b, c];
+RESULT:
+['a', 'b', 'c']
+```
+
+It gets the job done, but it's not nice to read. Fortunately, there's a nicer syntax now. The next example does the same thing as the previous one, but notice how much shorter the [a, b, c] assignment is.
+
+2.
+```js
+const letters = ['a', 'b', 'c', 'd'];
+const [a, b, c] = letters;
+[a, b, c];
+RESULT:
+['a', 'b', 'c']
+```
+
+This feature is called "destructuring". An array has some structure: certain values at certain indexes. We use destructuring syntax to unpack, or remove, that structure to access the individual pieces. We "de-structure" the array.
+
+Use array destructuring to extract the first two user names in the list. Put them in the firstUser and secondUser variables.
+
+3.
+```js
+const names = ['Amir', 'Betty', 'Cindy', 'Dalili'];
+const [firstUser, secondUser] = names;
+const users = [firstUser, secondUser];
+users;
+GOAL:
+['Amir', 'Betty']
+YOURS:
+['Amir', 'Betty']
+```
+
+Assignments with let, const, and the legacy var syntax can all use destructuring.
+
+```js
+const letters = ['a', 'b', 'c', 'd'];
+let [a, b, c] = letters;
+[a, b, c];
+RESULT:
+['a', 'b', 'c']
+
+const letters = ['a', 'b', 'c', 'd'];
+var [a, b, c] = letters;
+[a, b, c];
+RESULT:
+['a', 'b', 'c']
+```
+
+We can skip array indexes by leaving them out of the destructuring syntax entirely.
+
+4.
+```js
+const letters = ['a', 'b', 'c', 'd'];
+const [a, , c] = letters;
+[a, c];
+RESULT:
+['a', 'c']
+```
+
+When we skip indexes like this, it's called "sparse array destructuring". (The dictionary definition of "sparse" is "thinly dispersed or scattered". We use "sparse" in many programming situations where a structure has empty spots.)
+
+If we try to destructure a value that doesn't have structure, like null or undefined, we'll get an error. (You can type error when a code example will throw an error.)
+
+5.
+```js
+const [a, b, c] = null;
+RESULT:
+TypeError: null is not iterable
+```
+
+6.
+```js
+const [a, b, c] = 5;
+RESULT:
+TypeError: 5 is not iterable
+```
+
+If the object has too few indexes, we'll get undefined for those indexes, but no error occurs.
+
+7.
+```js
+const letters = ['a', 'b', 'c'];
+const [a, b, c, d] = letters;
+[c, d];
+RESULT:
+['c', undefined]
+```
+
+We can provide defaults when destructuring. If the array has no value at that key, we'll get the default instead. This is useful to avoid getting undefined, like we did in the example above. (Note the new = syntax in the destructuring below.)
+
+8.
+```js
+const letters = ['a', 'b', 'c'];
+const [a, b, c, d='dee'] = letters;
+[c, d];
+RESULT:
+['c', 'dee']
+```
+
+9.
+```js
+const letters = ['a', 'b', 'c', 'd'];
+const [a, b, c, d='dee'] = letters;
+[c, d];
+RESULT:
+['c', 'd']
+```
+
+Elements with and without defaults can be mixed. In the example below, d has a default but e doesn't. The matched array has no value for e, so it will get the value undefined.
+
+10.
+```js
+const letters = ['a', 'b', 'c'];
+const [a, b, c, d='dee', e] = letters;
+[d, e];
+RESULT:
+['dee', undefined]
+```
+
+We can collect any remaining elements using ..., similar to how we used "rest parameters" in function definitions. The ... in the next example collects all of the array elements that weren't matched in the destructuring.
+
+11.
+```js
+const letters = ['a', 'b', 'c'];
+const [a, ...others] = letters;
+others;
+RESULT:
+['b', 'c']
+```
+
+Rest parameters are always returned to us in an array, even if there's only one of them.
+
+12.
+```js
+const letters = ['a', 'b', 'c'];
+const [a, b, ...others] = letters;
+others;
+RESULT:
+['c']
+```
+
+Use a single array destructuring operation to:
+
+Put the first and second user names into firstUser and secondUser variables.
+Put the rest of the user names into an otherUsers variable.
+
+13.
+```js
+const names = ['Amir', 'Betty', 'Cindy', 'Dalili'];
+const [firstUser, secondUser, ...otherUsers] = names;
+const users = [firstUser, secondUser, otherUsers];
+users;
+GOAL:
+['Amir', 'Betty', ['Cindy', 'Dalili']]
+YOURS:
+['Amir', 'Betty', ['Cindy', 'Dalili']]
+```
+
+What about destructuring with [...others, c]? It seems like that should mean "put the last element in c and all other elements before it in others." However, that's not supported and will throw an error.
+
+14.
+```js
+const letters = ['a', 'b', 'c']
+const [...others, a] = letters
+others
+RESULT:
+SyntaxError: on line 2: Rest element must be last element.
+```
+
+Strings can also be destructured like arrays. When we do that, we get the string's individual characters. (JavaScript has no dedicated character type, so the characters will be represented as strings with length 1, like 'a'.)
+
+15.
+```js
+const letters = 'abc';
+const [a, b, c] = letters;
+b;
+RESULT:
+'b'
+```
+
+We can use a rest element to get all of a string's characters, regardless of the string's length.
+
+16.
+```js
+const s = 'this is a long string';
+const [...chars] = s;
+chars[2];
+RESULT:
+'i'
+```
 
 ## Lesson 8 Modern JavaScript: Computed Properties 
 
