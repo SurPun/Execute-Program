@@ -326,9 +326,269 @@ let and const nicely encapsulate the goals of ECMAScript 5, ECMAScript 2015, and
 
 let and const aren't flashy, and they won't make a web app twice as fast. But they fixed a twenty-year-old design mistake in JavaScript, and have made the language more suitable for large-scale application development. That's what ECMAScript 2015 and beyond have been about: modernizing the language, fixing the mistakes.
 
-## Lesson 4
+## Lesson 4 Modern JavaScript: For of loops
 
-## Lesson 5
+JavaScript has a for...in loop that iterates over an object's keys (not its values):
+
+1.
+```js
+const obj = {a: 1, b: 2};
+const keys = [];
+for (const key in obj) {
+  keys.push(key);
+}
+keys;
+RESULT:
+['a', 'b']
+```
+
+This seems OK, but it causes some strange edge cases. To see one edge case, we'll take a detour into JavaScript arrays. Unlike most other languages, JavaScript's arrays are a special kind of JavaScript object. typeof someArray is even 'object', not 'array'!
+
+2.
+```js
+typeof [1, 2, 3];
+RESULT:
+'object'
+```
+
+That means that we can treat arrays as objects. For example, we can ask for their keys. The "keys" of ['a', 'b'] are ['0', '1']: the array's indexes converted into strings.
+
+3.
+```js
+Object.keys(['a', 'b', 'c']);
+RESULT:
+['0', '1', '2']
+```
+
+JavaScript arrays can be "sparse": they can have elements missing. Suppose that we create an empty array (const numbers = []) and insert a value at index 3 (numbers[3] = 'a'). In most languages (Java, Python), that would be an error. In some languages (Ruby), it would implicitly fill indexes 0 through 2 with null, nil, or whatever other "not-a-value" value the language has.
+
+In JavaScript, it does neither of those! That array has a value at index 3, but it has nothing at indexes 0, 1, or 2. This is an important point: it's not that the array has undefined or null at indexes 0-2. It has nothing at all there.
+
+JavaScript's for...in loop skips missing array elements. If we loop over the object with for...in, the keys 0-2 don't even show up. Only 3 shows up (as the string '3')!
+
+4.
+```js
+const letters = [];
+letters[3] = 'a';
+const keys = [];
+for (const key in letters) {
+  keys.push(key);
+}
+keys;
+RESULT:
+['3']
+```
+
+This can cause very confusing bugs if you're not expecting it. (There are similar problems with regular, non-array objects, but this array problem is much quicker to demonstrate.)
+
+Fortunately, modern JavaScript provides a better type of loop: for...of. It loops over the values in an array, not the keys. This mimics the "for-each" loops available in Java, Python, Ruby, and most other languages.
+
+5.
+```js
+const letters = ['a', 'b', 'c'];
+const result = [];
+for (const letter of letters) {
+  result.push(letter);
+}
+result;
+RESULT:
+['a', 'b', 'c']
+```
+
+What about a sparse array (an array with some missing indexes)? Fortunately, for...of behaves as we'd expect. It iterates from index 0 until the highest index in the array. If some indexes are missing, it will still iterate over them, giving us the value undefined. In the example below, the loop body executes four times, giving us undefined the first three times.
+
+6.
+```js
+const numbers = [];
+numbers[3] = 'a';
+const result = [];
+for (const n of numbers) {
+  result.push(n);
+}
+result;
+RESULT:
+[undefined, undefined, undefined, 'a']
+```
+
+What if we want to iterate over an object's keys, like for...in does? Fortunately, since 2011 JavaScript has had an Object.keys method that gives us an object's keys as an array. Then we can for...of over that array.
+
+7.
+```js
+const obj = {a: 1, b: 2};
+const keys = [];
+for (const key of Object.keys(obj)) {
+  keys.push(key);
+}
+keys;
+RESULT:
+['a', 'b']
+```
+
+And what if we want to iterate over a string? It does what you'd expect! The loop body executes once per character in the string. JavaScript doesn't have a dedicated character type, so the individual characters will show up as strings of length 1, like 'a'.
+
+8.
+```js
+const s = 'loop';
+const chars = [];
+for (const char of s) {
+  chars.push(char);
+}
+chars;
+RESULT:
+['l', 'o', 'o', 'p']
+```
+
+for...of loops also work well with other modern JavaScript features like iterators and generators. We'll see concrete examples when we get to those topics.
+
+As is often the case, linters can stop you from accidentally using the old for...in syntax. ESLint's guard-for-in rule will stop you from accidentally using for...in when you mean for...of. (It will still allow for...in if you use certain patterns to make it safe.)
+
+## Lesson 5 Modern JavaScript: Template literals
+
+JavaScript has always had two syntaxes for strings: 'single quoted' and "double quoted". There's now a third type of string written with `backticks`. They're treated as ordinary strings: `hello` is the same as 'hello'.
+
+1.
+```js
+`hello`;
+RESULT:
+'hello'
+```
+
+2.
+```js
+`hello` === 'hello';
+RESULT:
+true
+```
+
+These strings are called "template literals". They have several features that allow them to be used as a "templates", with holes that are filled in later.
+
+Interpolation is the most common use case. "Interpolation" means "inserting something into something else". With template literals, we can insert the result of any JavaScript expression into the string by wrapping it in ${...}
+
+```js
+`1 + 1 = ${1 + 1}`;
+RESULT:
+'1 + 1 = 2'
+```
+
+3.
+```js
+`${'Shouting'.toUpperCase()} and ${'Whispering'.toLowerCase()}`;
+RESULT:
+'SHOUTING and whispering'
+```
+
+Interpolating with ${...} converts the value to a string by calling its .toString() method. For numbers, that works great. But for arrays, it probably won't do what we want. For objects, it definitely won't do what we want!
+
+```js
+[1, 2].toString();
+RESULT:
+'1,2'
+
+({a: 1}).toString();
+RESULT:
+'[object Object]'
+```
+
+4.
+```js
+`two numbers: ${[1, 2]}`;
+RESULT:
+'two numbers: 1,2'
+```
+
+5.
+```js
+const obj = {a: 1};
+`an object: ${obj}`;
+RESULT:
+'an object: [object Object]'
+```
+
+We can interpolate as many JavaScript expressions as we like.
+
+
+6.
+```js
+const x = 4;
+`1 + ${x} = ${x + 1}`;
+RESULT:
+'1 + 4 = 5'
+```
+
+Write a function that writes out a sum the long way. Use template literals to build a string including the two numbers and the final sum.
+
+7.
+```js
+function longSum(x, y) {
+  return `${x} + ${y} = ${x + y}`;
+  }
+[longSum(1, 2), longSum(10, 20)];
+GOAL:
+['1 + 2 = 3', '10 + 20 = 30']
+YOURS:
+['1 + 2 = 3', '10 + 20 = 30']
+```
+
+All of the usual string syntax also works inside template literals. For example, inside of 'quotes', \' is a single quote. We can also write \' inside template literals.
+
+8.
+```js
+`\'`;
+RESULT:
+"'"
+```
+
+9.
+```js
+'\'';
+RESULT:
+"'"
+```
+
+Execute Program renders the string result identically no matter which syntax we use to define it. That's because template literals evaluate to regular strings when used in this way.
+
+Normally, JavaScript strings can't have newlines in them:
+
+```js
+const x = 'oh
+no'
+RESULT:
+SyntaxError: on line 1: Unterminated string constant.
+```
+
+However, template literals don't have that limitation: they can contain newlines! This simplifies a lot of code. For example, here's an email template written using old-style JavaScript:
+
+10.
+```js
+const name = 'Amir';
+const email = [
+  'Hi, ' + name,
+  '',
+  "We've updated our privacy policy!",
+].join('\n');
+email === "Hi, Amir\n\nWe've updated our privacy policy!";
+RESULT:
+true
+```
+
+Here's a version with template literals. It's much cleaner: we don't have to constantly open and close quotes, and we don't have to merge the lines with join.
+
+11.
+```js
+const name = 'Amir';
+const email = `
+  Hi, ${name},
+  
+  We've updated our privacy policy!
+`;
+email === "\n  Hi, Amir,\n  \n  We've updated our privacy policy!\n";
+RESULT:
+true
+```
+
+There is one important difference between the two examples above. In the template literal version, the string includes all of the whitespace between the opening and closing backtick. That includes the newlines, which we wanted. But it also includes the indentation on the front of the individual lines, which we may not want.
+
+There are ways to remove that leading whitespace, like the dedent NPM module. But sometimes the whitespace doesn't matter. For example: in most cases, whitespace between HTML tags won't cause any problems, so we can leave it in.
 
 ## Lesson 6
 
