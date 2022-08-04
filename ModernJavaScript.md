@@ -1094,3 +1094,193 @@ false
 ```
 
 It's difficult to remember that there are two isNaNs and that one of them is preferable. Often, we can use linters to ensure that we don't mix these things up. But, unfortunately, the eslint linter doesn't have direct support for disallowing the global isNaN. However, you can configure the no-restricted-globals rule to disallow isNaN, which will have the same effect.
+
+## Lesson 10 Modern JavaScript: Tagged template literals
+
+Template literals can be "tagged", where we provide a function along with the template string. The tag can modify or replace the template literal string. It looks like replaceWithHello`the numbers ${1} and ${1 + 1}`. (replaceWithHello is the function being used as a template literal tag.)
+
+```js
+function replaceWithHello() {
+  return 'hello';
+}
+RESULT:
+undefined
+```
+
+When we tag a template literal, the return value of the tagging function replaces the entire template string.
+
+```js
+function replaceWithHello() {
+  return 'hello';
+}
+RESULT:
+undefined
+```
+
+When we tag a template literal, the return value of the tagging function replaces the entire template string.
+
+```js
+replaceWithHello`goodbye`;
+RESULT:
+'hello'
+```
+
+1.
+```js
+replaceWithHello`the numbers ${1} and ${1 + 1}`;
+RESULT:
+'hello'
+```
+
+In that case, replaceWithHello`the numbers ${1} and ${1 + 1}` behaved the same as a normal function call. We could have written replaceWithHello('an ordinary string') and gotten the same result.
+
+However, template literals can do more than a normal function call. The JavaScript virtual machine splits the template literal into pieces, passing them to our tag function as arguments.
+
+We'll define a function returnsItsArguments. Then we'll use it as a template literal tag. That will show us what arguments the tag function gets.
+
+
+```js
+function returnsItsArguments(strings, ...values) {
+  return {
+    firstArg: strings,
+    secondArg: values,
+  };
+}
+RESULT:
+undefined
+
+returnsItsArguments`1${2}3`;
+RESULT:
+{firstArg: ['1', '3'], secondArg: [2]}
+```
+
+The first argument contains all of the literal strings in the template literal (everything not in a ${...}). The second argument contains all of the interpolated values (everything inside a ${...}). Literal strings are passed as an array argument; interpolated values are passed as rest parameters.
+
+There will always be one more literal string than there are interpolated values. If there are 7 interpolated values, there will be 8 literal strings. If necessary, the last literal string will be an empty string, '', but it will still be there. Here's an example:
+
+```js
+returnsItsArguments`1${2}`;
+RESULT:
+{firstArg: ['1', ''], secondArg: [2]}
+```
+
+Watch out for spaces in the literal strings. In the next example, the literal strings are ['the numbers ', ' and ', '']. The interpolated values are [1, 2].
+
+2.
+```js
+returnsItsArguments`the numbers ${1} and ${2}`;
+RESULT:
+{firstArg: ['the numbers ', ' and ', ''], secondArg: [1, 2]}
+```
+
+The tag function can do anything with those two arrays. For example, it can mimic regular variable interpolation. (That's the kind that we've already seen, where `1 + 1 = ${1 + 1}` evaluates to '1 + 1 = 2'.)
+
+In the next example, note the if (i < values.length). It's working around the fact that there's always one final string literal with no corresponding interpolated value.
+
+3.
+```js
+function interpolate(strings, ...values) {
+  let reconstructed = '';
+  for (let i=0; i<strings.length; i++) {
+    reconstructed += strings[i];
+    if (i < values.length) {
+      reconstructed += values[i];
+    }
+  }
+  return reconstructed;
+}
+interpolate`the numbers ${1} and ${2}`;
+RESULT:
+'the numbers 1 and 2'
+```
+
+This next example is similar to the one above, but we modify the interpolated values right before we insert them into the final string.
+
+Write a doubleNumbers template literal tag. It mimics normal string interpolation, but doubles all of the interpolated values as they're inserted.
+
+4.
+```js
+function doubleNumbers(strings, ...values) {
+  let result = '';
+  for (let i=0; i<strings.length; i++) {
+    result += strings[i];
+    if (i < values.length) {
+      result += values[i] + values[i];
+    }
+  }
+    return result;
+ }
+doubleNumbers`the numbers ${1} and ${2}`;
+GOAL:
+'the numbers 2 and 4'
+YOURS:
+'the numbers 2 and 4'
+```
+
+Now for a more realistic example: escaping values in HTML. We want to write template strings like <p>${user.name}</p>. If the user's name contains a '<', then it should be escaped to '&lt;'. Likewise for escaping '>' to '&gt;'. For example, if the user's name is 'Amir >_<', the final HTML-safe string should be <p>Amir &gt;_&lt;</p>.
+
+Write a template tag function escapeHTML that escapes angle brackets in all interpolated values. An escapeOneHTMLValue function is provided for you. You'll need to call it on each interpolated value. Remember that strings is always longer than values by exactly 1 element.
+
+5.
+```js
+function escapeOneHTMLValue(value) {
+  return value
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+​
+function escapeHTML(strings, ...values) {
+  let result = '';
+  for (let i=0; i<strings.length; i++) {
+    result += strings[i];
+    if (values[i] !== undefined) {
+      result += escapeOneHTMLValue(values[i]);
+    }
+  }
+  return result;
+}
+​
+const user = {
+  name: 'Amir >_<',
+};
+​
+escapeHTML`<p>${user.name}</p>`;
+GOAL:
+'<p>Amir &gt;_&lt;</p>'
+YOURS:
+'<p>Amir &gt;_&lt;</p>'
+```
+
+The approach above is used in the popular common-tags library's safeHtml tagged template literal. (That library also provides many other pre-made template tags.)
+
+At first, it seems strange that the literal strings are passed in an array, with the interpolated values passed separately. Why not combine them into one array?
+
+Because it would be confusing to mix literal values and interpolated values together, especially when the interpolated values are strings. For example, consider the call someFunction`the string ${'a'}` . The tag function would get an array mixing literal strings and interpolated values: ['the string ', 'a', '']. Passing the strings and interpolated values separately makes it clear which is which.
+
+One final note about tagged template literals. If you don't use semicolons in your JavaScript, you might encounter some strange failures.
+
+```js
+const obj = {a: 1}
+`an object: ${obj}`;
+RESULT:
+ReferenceError: Cannot access 'obj' before initialization
+```
+
+This error message seems completely wrong: obj is clearly defined before it's used! The problem is that JavaScript isn't parsing this code in the way we think it should. It thinks that the object {a: 1} is being used as a tag function for the template literal. Here's the same thing reformatted to make it more clear:
+
+```js
+const obj = (
+  ({a: 1})`an object: ${obj}`
+);
+RESULT:
+ReferenceError: Cannot access 'obj' before initialization
+```
+
+We can fix this by using semicolons all the time. Or we can insert one semicolon here so that the virtual machine parses the code in the way that we expect.
+
+```js
+const obj = {a: 1};
+`an object: ${obj}`;
+RESULT:
+'an object: [object Object]'
+```
