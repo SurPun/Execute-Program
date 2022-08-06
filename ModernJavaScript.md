@@ -1284,3 +1284,60 @@ const obj = {a: 1};
 RESULT:
 'an object: [object Object]'
 ```
+
+## Lesson 12 Modern JavaScript: Shorthand properties
+
+Historically, we'd often have to use the pattern below, where the key of an object refers to a variable of the same name:
+
+1.
+```js
+const name = 'Amir';
+const user = {name: name};
+user.name;
+RESULT:
+'Amir'
+```
+
+It gets the job done, but it can cause a lot of code bloat when there are many properties.
+
+2.
+```js
+const name = 'Amir';
+const catName = 'Ms. Fluff';
+const city = 'Paris';
+const age = 36;
+
+const user = {
+  name: name,
+  catName: catName,
+  city: city,
+  age: age,
+};
+[user.name, user.age];
+RESULT:
+['Amir', 36]
+```
+
+In modern JavaScript, we can shorten this significantly. When the object's key refers to a variable of the same name, we only have to specify that name once. Instead of {name: name}, we can just write {name}.
+
+3.
+```js
+const name = 'Amir';
+const catName = 'Ms. Fluff';
+const city = 'Paris';
+const age = 36;
+
+const user = {name, catName, city, age};
+[user.name, user.age];
+RESULT:
+['Amir', 36]
+```
+
+We can't use this to refer to a variable that doesn't exist. As with the older syntax, that will cause an error. (You can type error when a code example will throw an error.)
+
+4.
+```js
+const user = {age};
+RESULT:
+ReferenceError: age is not defined
+```
