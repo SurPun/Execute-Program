@@ -1341,3 +1341,21 @@ const user = {age};
 RESULT:
 ReferenceError: age is not defined
 ```
+
+## Lesson 12 Modern JavaScript: Shorthand methods
+
+Modern JavaScript allows the definition of methods right inside an object literal.
+
+```js
+const user = {
+  name() { return 'Amir'; }
+};
+user.name();
+RESULT:
+'Amir'
+```
+
+Methods defined in this way are called "shorthand methods". (We've already seen "shorthand properties", which let us say {name}. This feature is related to that one in that they're both shorthands, but there's no deeper relation between them than that.)
+
+Shorthand methods have a this that refers to the parent object. We can access its properties by doing this.somePropertyName:
+
