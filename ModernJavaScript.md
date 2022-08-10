@@ -1342,7 +1342,7 @@ RESULT:
 ReferenceError: age is not defined
 ```
 
-## Lesson 12 Modern JavaScript: Shorthand methods
+## Lesson 13 Modern JavaScript: Shorthand methods
 
 Modern JavaScript allows the definition of methods right inside an object literal.
 
@@ -1359,3 +1359,35 @@ Methods defined in this way are called "shorthand methods". (We've already seen 
 
 Shorthand methods have a this that refers to the parent object. We can access its properties by doing this.somePropertyName:
 
+5.
+```js
+const address = {
+  city: 'Paris',
+  country: 'France',
+  addressString() { return `${this.city}, ${this.country}`; },
+};
+address.addressString();
+RESULT:
+'Paris, France'
+```
+
+Shorthand methods can also call other shorthand methods.
+
+Add a new volume method to this object using JavaScript's shorthand method syntax. (The volume is the base area times the height. We've provided an existing baseArea method for you to call.)
+
+```js
+const rectangle3D = {
+  width: 3,
+  depth: 4,
+  height: 5,
+  baseArea() { return this.width * this.depth; },
+  volume() { return this.baseArea() * this.height }
+};
+rectangle3D.volume();
+GOAL:
+60
+YOURS:
+60
+```
+
+As always, JavaScript's this has some sharp edges, so this isn't the full story. We'll see details of that in later lessons.
