@@ -1531,9 +1531,132 @@ RESULT:
 'Betty'
 ```
 
+## Lesson 15 Modern JavaScript: Bind
+ 
+this refers to the object that a function belongs to. The rules get complex, but here's a simple example with shorthand methods.
 
+In the example below, this inside userName refers to the object that userName belongs to: user.
 
+1.
+```js
+const user = {
+  name: 'Amir',
+  userName() { return this.name; }
+};
+user.userName();
+RESULT:
+'Amir'
+```
 
+The scoping rules for JavaScript's this are notorious. We'll see examples throughout this course, but we'll also see ways to avoid the problems entirely.
 
+Sometimes, when writing JavaScript code, we'll get backed into a corner where we need to force a function to have a certain this. We can do exactly that with the bind method.
 
+bind is a method on functions themselves, so we say someFunction.bind(someNewThis). That gives us a new version of the function, leaving the original function unchanged. When we call the new function, this will be bound to our specified value. Here's a before-and-after:
 
+```js
+const user = {name: 'Amir'};
+function userName() {
+  return this.name;
+}
+userName();
+RESULT:
+TypeError: Cannot read property 'name' of undefined
+```
+
+2.
+```js
+const user = {name: 'Amir'};
+function userName() {
+  return this.name;
+}
+const userNameBound = userName.bind(user);
+userNameBound();
+RESULT:
+'Amir'
+```
+
+We don't have to introduce a temporary variable to hold the bound function; we can do it as a single expression.
+
+3.
+```js
+const user = {name: 'Amir'};
+function userName() {
+  return this.name;
+}
+userName.bind(user)();
+RESULT:
+'Amir'
+```
+
+Use bind to call the getAddressString function with address bound to this.
+
+4.
+```js
+function getAddressString() {
+  return `${this.city}, ${this.country}`;
+}
+const address = {
+  city: 'Paris',
+  country: 'France',
+};
+getAddressString.bind(address)();
+GOAL:
+'Paris, France'
+YOURS:
+'Paris, France'
+```
+
+Let's see an example of where we might use bind. We've seen shorthand methods defined using the syntax functionName() { ... }. They have a this that refers to the parent object:
+
+5.
+```js
+const address = {
+  city: 'Paris',
+  country: 'France',
+  addressString() { return `${this.city}, ${this.country}`; },
+};
+address.addressString();
+RESULT:
+'Paris, France'
+```
+
+What happens if addressString returns a function instead of returning the string directly? It won't work, because the inner function has a different this. In the inner function, this will be undefined.
+
+```js
+const address = {
+  city: 'Paris',
+  country: 'France',
+  addressString() {
+    return function() {
+      return `${this.city}, ${this.country}`;
+    };
+  },
+};
+address.addressString()();
+RESULT:
+TypeError: Cannot read property 'city' of undefined
+```
+
+Depending on where you run that example – in a browser, at a Node REPL, etc. – you may see a different error message. But you can be sure that this won't refer to the containing address object. It might be window or undefined or something else.
+
+We can use JavaScript's bind method to manually set our inner function's this:
+
+6.
+```js
+const address = {
+  city: 'Paris',
+  country: 'France',
+  addressString() {
+    const f = function() {
+      return `${this.city}, ${this.country}`;
+    };
+    return f.bind(this);
+  },
+};
+address.addressString()();
+RESULT:
+'Paris, France'
+```
+
+This particular bind example is a bit weird, because we'll soon see a better way to do this using a feature called arrow functions. But that also shows us a general lesson: bind should be used sparingly. Usually, there's a better way to solve scoping problems. When you're tempted to use bind, we recommend searching for another solution, then using bind only as a last resort.
