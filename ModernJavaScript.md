@@ -1375,6 +1375,7 @@ Shorthand methods can also call other shorthand methods.
 
 Add a new volume method to this object using JavaScript's shorthand method syntax. (The volume is the base area times the height. We've provided an existing baseArea method for you to call.)
 
+6.
 ```js
 const rectangle3D = {
   width: 3,
@@ -1391,3 +1392,148 @@ YOURS:
 ```
 
 As always, JavaScript's this has some sharp edges, so this isn't the full story. We'll see details of that in later lessons.
+
+## Lesson 14 Modern JavaScript: Basic object destructuring
+
+We've seen destructuring in arrays:
+
+1.
+```js
+const names = ['Amir', 'Betty'];
+const [firstName] = names;
+firstName;
+RESULT:
+'Amir'
+```
+
+We can also destructure objects. For objects, we pick out specific keys, rather than picking out specific indexes like we did with arrays.
+
+2.
+```js
+const user = {name: 'Amir', email: 'amir@example.com', age: 36};
+const {name, age} = user;
+[name, age];
+RESULT:
+['Amir', 36]
+```
+
+As with arrays, trying to destructure null or undefined will throw an error. (You can type error when a code example will throw an error.)
+
+3.
+```js
+const {name} = null;
+RESULT:
+TypeError: Cannot destructure property 'name' of 'null' as it is null.
+
+const {name} = undefined;
+RESULT:
+TypeError: Cannot destructure property 'name' of 'undefined' as it is undefined.
+```
+
+If the key doesn't exist in the object, we'll get undefined.
+
+4.
+```js
+const user = {name: 'Amir', email: 'amir@example.com'};
+const {age} = user;
+age;
+RESULT:
+undefined
+```
+
+We can supply default values when destructuring. If the key doesn't exist, we'll get the default value instead.
+
+5.
+```js
+const user = {name: 'Amir', email: 'amir@example.com'};
+const {age=36} = user;
+age;
+RESULT:
+36
+
+const user = {name: 'Amir', email: 'amir@example.com', age: 37};
+const {age=36} = user;
+age;
+RESULT:
+37
+```
+
+We can collect the rest of the keys with ..., which will give us an object with every key that wasn't matched explicitly. In the next example, ...rest will give us an object with the email key and its value.
+
+6.
+```js
+const user = {name: 'Amir', email: 'amir@example.com'};
+const {name, ...rest} = user;
+rest;
+RESULT:
+{email: 'amir@example.com'}
+```
+
+Use a single object destructuring operation to:
+- Extract the user's name into the name variable.
+- Put all of the other keys and values into a rest variable.
+
+7.
+```js
+const user = {name: 'Amir', email: 'amir@example.com', age: 36};
+const {name, ...rest} = user;
+const nameAndRest = [name, rest];
+nameAndRest;
+GOAL:
+['Amir', {age: 36, email: 'amir@example.com'}]
+YOURS:
+['Amir', {age: 36, email: 'amir@example.com'}]
+```
+
+When necessary, we can destructure a key into a variable with a different name. We separate the object key and the variable name with a :.
+
+8.
+```js
+const {name: userName} = {name: 'Amir', email: 'amir@example.com'};
+userName;
+RESULT:
+'Amir'
+```
+
+What if we want to destructure an object, but we don't know the name of the key in advance? We can do that using syntax that's similar to the computed properties that we've already seen.
+
+```js
+const key = 'name';
+const {[key]: value} = {name: 'Amir'};
+value;
+RESULT:
+'Amir'
+```
+
+[key] is the key, whose name is computed at runtime by looking at the variable key. That variable contains 'name', so we're looking up the name key. (Don't let the [square brackets] fool you: there are no arrays involved here.)
+
+value is the name of the variable that will hold the value in that key. If key is 'name', that means that value will hold 'Amir'.
+
+As with regular computed properties, we can put any expression inside the [square brackets].
+
+9.
+```js
+const key = 'NaMe';
+const {[key.toLowerCase()]: value} = {name: 'Amir'};
+value;
+RESULT:
+'Amir'
+```
+
+Destructuring interacts nicely with getters. If an object's key is a getter, we can destructure that key as usual. We'll get the value returned by the getter.
+
+10.
+```js
+const user = {get name() { return 'Be' + 'tty'; }};
+const {name} = user;
+name;
+RESULT:
+'Betty'
+```
+
+
+
+
+
+
+
