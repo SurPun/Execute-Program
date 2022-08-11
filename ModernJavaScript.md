@@ -1660,3 +1660,121 @@ RESULT:
 ```
 
 This particular bind example is a bit weird, because we'll soon see a better way to do this using a feature called arrow functions. But that also shows us a general lesson: bind should be used sparingly. Usually, there's a better way to solve scoping problems. When you're tempted to use bind, we recommend searching for another solution, then using bind only as a last resort.
+
+## Lesson 16 Modern JavaScript: Generators
+
+JavaScript's old for-in loop worked with arrays, objects, and strings. The for-of loop is newer, but at first glance it seems to be more limited:
+
+```js
+const user = {
+  name: 'Amir',
+  age: 36,
+};
+for (const key of user) {
+}
+RESULT:
+TypeError: user is not iterable
+```
+
+However, new features in modern JavaScript allow us to write new functions and objects that work with for loops. The easiest way is with generators. We'll look at a working example first, then examine it in detail.
+
+Here's a generator that returns three numbers:
+
+```js
+function* numbers() {
+  yield 1;
+  yield 2;
+  yield 3;
+}
+RESULT:
+undefined
+```
+
+And here's a for-of loop over it, where the loop sees each of those three numbers:
+
+```js
+const results = [];
+for (const n of numbers()) {
+  results.push(n);
+}
+results;
+RESULT:
+[1, 2, 3]
+```
+
+Now the details:
+
+The * in function* marks our function as a generator.
+When we call a generator function, we get an object that a for-of loop can loop over.
+Each yield in the generator provides one value to the loop.
+The yield part is a bit weird. One way to think about it is: it's like return, but we can do it multiple times. Each time we yield, the generator function stops running temporarily, and the code inside the for-of loop runs once, consuming the yielded value. Then the generator picks up where it left off to yield another value; then the loop body runs again to consume that value. And so on until the generator function ends.
+
+Writing for-of loops to demonstrate our generators is tedious, so we'll switch to Array.from() to convert the generators into arrays. That makes our examples shorter.
+
+
+```js
+function* letters() {
+  yield 'a';
+  yield 'b';
+}
+Array.from(letters());
+RESULT:
+['a', 'b']
+```
+
+Generator functions are still functions, so they can contain any code that is allowed in a function.
+
+
+1.
+```js
+function* numbers() {
+  let x = 1;
+  yield x;
+  x += 1;
+  yield x;
+}
+Array.from(numbers());
+RESULT:
+[1, 2]
+```
+
+2.
+```js
+function* numbersBelow(maximum) {
+  for (let i=0; i<maximum; i++) {
+    yield i;
+  }
+}
+Array.from(numbersBelow(3));
+RESULT:
+[0, 1, 2]
+```
+
+3.
+```js
+Array.from(numbersBelow(4));
+RESULT:
+[0, 1, 2, 3]
+```
+
+Write a numbersInRange(min, max) generator that iterates over all numbers from min up to, but not including, max.
+
+4.
+```js
+function* numbersInRange(min, max) {
+  for(let i = min; i < max; i ++) {
+    yield i;
+  }
+}
+const results = [
+  Array.from(numbersInRange(0, 2)),
+  Array.from(numbersInRange(1, 3)),
+  // This checks that you actually wrote a generator. No cheating!
+  numbersInRange.constructor.name,
+];
+results;
+GOAL:
+[[0, 1], [1, 2], 'GeneratorFunction']
+YOURS:
+[[0, 1], [1, 2], 'GeneratorFunction']
+```
