@@ -1779,7 +1779,7 @@ YOURS:
 [[0, 1], [1, 2], 'GeneratorFunction']
 ```
 
-## Lesson 16 Modern JavaScript: Places where destructuring is allowed
+## Lesson 17 Modern JavaScript: Places where destructuring is allowed
 
 We've already seen some examples of destructuring. In this lesson, we'll step back to see them in context: how they interact with each other and with other parts of the language.
 
@@ -1882,3 +1882,5 @@ rest(1, 2, 3);
 RESULT:
 [2, 3]
 ```
+
+## Lesson 18
