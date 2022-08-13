@@ -1778,3 +1778,107 @@ GOAL:
 YOURS:
 [[0, 1], [1, 2], 'GeneratorFunction']
 ```
+
+## Lesson 16 Modern JavaScript: Places where destructuring is allowed
+
+We've already seen some examples of destructuring. In this lesson, we'll step back to see them in context: how they interact with each other and with other parts of the language.
+
+Destructuring works in function definitions. The destructuring rules are the same as when we destructure in a const or let statement.
+
+1.
+```js
+function getFirstArrayElement(array) {
+  return array[0];
+}
+getFirstArrayElement(['cat', 'dog', 'horse']);
+RESULT:
+'cat'
+```
+
+2.
+```js
+function getFirstArrayElement([first]) {
+  return first;
+}
+getFirstArrayElement(['cat', 'dog', 'horse']);
+RESULT:
+'cat'
+```
+
+3.
+```js
+function getUserName({name}) {
+  return name;
+}
+getUserName({name: 'Ebony'});
+RESULT:
+'Ebony'
+```
+
+Finish this function that turns cat objects (like {name: 'Ms. Fluff', age: 4}) into cat summary strings (like Ms. Fluff (4)). Use destructuring to extract name and age from the cat object.
+
+4.
+```js
+function catDescription({name, age}) {
+  return `${name} (${age})`;
+}
+[
+  catDescription({name: 'Ms. Fluff', age: 4}),
+  catDescription({name: 'Keanu', age: 2}),
+];
+GOAL:
+['Ms. Fluff (4)', 'Keanu (2)']
+YOURS:
+['Ms. Fluff (4)', 'Keanu (2)']
+```
+
+Destructuring can also be used in for-of loops.
+
+5.
+```js
+const users = [{name: 'Amir'}, {name: 'Betty'}];
+const names = [];
+for (const {name} of users) {
+  names.push(name);
+}
+names;
+RESULT:
+['Amir', 'Betty']
+```
+
+Destructuring can even be used in catch blocks!
+
+6.
+```js
+let userName = undefined;
+try {
+  throw {name: 'Amir'};
+} catch ({name}) {
+  userName = name;
+}
+userName;
+RESULT:
+'Amir'
+```
+
+There's a parallel here with "rest" parameters. Here are two ways to write a function named rest returning an array with the first element removed. One of them takes the array argument directly; the other takes multiple positional arguments. Both use destructuring to access the values. (Watch out for the lonely , that skips the first array element.)
+
+7.
+```js
+function rest([, ...rest]) {
+  return rest;
+}
+rest([1, 2, 3]);
+RESULT:
+[2, 3]
+```
+
+8.
+```js
+function rest(_, ...rest) {
+  return rest;
+}
+rest(1, 2, 3);
+RESULT:
+[2, 3]
+```
