@@ -2042,4 +2042,236 @@ Destructuring can never modify the objects that we destructure, so we never have
 
 (There is technically one exception: if we're destructuring a getter property with side effects that change some object, then destructuring will trigger those side effects. But getters shouldn't have side effects in the first place, so hopefully you'll never encounter that!)
 
-## Lesson 19
+## Lesson 19 Modern JavaScript: Arrow functions
+
+JavaScript has always supported function definitions with and without names:
+
+1.
+```js
+function f() {
+  return 1;
+}
+f();
+RESULT:
+1
+
+const f = function() {
+  return 1;
+};
+f();
+RESULT:
+1
+
+(function() {
+  return 1;
+})();
+RESULT:
+1
+```
+
+We can use the function syntax to define callbacks, but it's awkward:
+
+```js
+[1, 2, 3].map(function (x) { return x * 2; });
+RESULT:
+[2, 4, 6]
+```
+
+Modern JavaScript supports another syntax for function definition called "arrow functions" (because the operator looks like an arrow). This one takes an argument x, then returns x * 2.
+
+2.
+```js
+[1, 2, 3].map(x => x * 2);
+RESULT:
+[2, 4, 6]
+```
+
+The arrow function above took exactly one argument, so we could write it in the shortest arrow function form, x => x * 2. When a function takes any other number of arguments (including zero), we have to put parentheses around them.
+
+3.
+```js
+[1, 2, 3].map(() => 5);
+RESULT:
+[5, 5, 5]
+```
+
+(In this next example, the index argument gets the index of each array element: 0, then 1, then 2.)
+
+
+4.
+```js
+[1, 2, 3].map((x, index) => index);
+RESULT:
+[0, 1, 2]
+```
+
+Arrow functions support rest parameters and destructuring, just like normal functions do. Using those features requires parentheses around the argument list, even if there's only one argument.
+
+5.
+```js
+const user = {name: 'Amir'};
+const getName = ({name}) => name;
+getName(user);
+RESULT:
+'Amir'
+
+const rest = (first, ...rest) => rest;
+rest(1, 2, 3, 4);
+RESULT:
+[2, 3, 4]
+```
+
+So far, we've only seen arrow functions on one line:
+
+6.
+```js
+const f = x => x * 2;
+f(3);
+RESULT:
+6
+```
+
+We can also write multi-line arrow functions by wrapping the function body in {curly braces}. This longer function does the same thing as the short version above:
+
+7.
+```js
+const f = x => {
+  const result = x * 2;
+  return result;
+};
+f(3);
+RESULT:
+6
+```
+
+One-line arrow functions implicitly return the value of that one line; there's no return statement. With multi-line arrow functions, we have to explicitly return a value.
+
+8.
+```js
+const f = x => {
+  if (x > 10) {
+    return 'many';
+  } else {
+    return 'few';
+  }
+};
+f(3);
+RESULT:
+'few'
+```
+
+If we forget the return in a multi-line arrow function, it will return undefined by default.
+
+9.
+```js
+const f = x => {
+  if (x > 10) {
+    'many';
+  } else {
+    'few';
+  }
+};
+f(3);
+RESULT:
+undefined
+```
+
+There's a problem related to these multi-line arrow functions. When an arrow function needs to return an object, you may be tempted to write it like the example below, but it won't work.
+
+```js
+const getUser = () => {
+  name: 'Amir',
+  age: 36,
+}
+RESULT:
+SyntaxError: on line 3: Missing semicolon.
+```
+
+We meant to return an object, but the { in that example is beginning a multi-line function body, not an object. The solution is to wrap the object in (parentheses). That's awkward, but it's the only way to clearly distinguish between multi-line functions and objects.
+
+10.
+```js
+const getUser = () => ({
+  name: 'Amir',
+  age: 36,
+});
+getUser().name;
+RESULT:
+'Amir'
+```
+
+The terseness of arrow functions is nice. But they have a second big benefit: their scoping rules are easier to think about than regular functions.
+
+We've seen situations where we're tempted to use bind to force a certain value into this. Here's a before and after showing that:
+
+```js
+const address = {
+  city: 'Paris',
+  country: 'France',
+  addressString() {
+    return function() {
+      return `${this.city}, ${this.country}`;
+    };
+  },
+};
+address.addressString()();
+RESULT:
+TypeError: Cannot read property 'city' of undefined
+
+const address = {
+  city: 'Paris',
+  country: 'France',
+  addressString() {
+    const f = function() {
+      return `${this.city}, ${this.country}`;
+    };
+    return f.bind(this);
+  },
+};
+address.addressString()();
+RESULT:
+'Paris, France'
+```
+
+11.
+```js
+const address = {
+  city: 'Paris',
+  country: 'France',
+  addressString() {
+    return () => `${this.city}, ${this.country}`;
+  },
+};
+address.addressString()();
+RESULT:
+'Paris, France'
+```
+
+Add a volumeFunction method to the 3D rectangle below. It should return a function that returns the 3D rectangle's volume. The function that you return should be an arrow function, which will ensure that it can see the rectangle's this.
+
+12.
+```js
+const rectangle3D = {
+  width: 3,
+  depth: 4,
+  height: 5,
+  baseArea() { return this.width * this.depth; },
+this.
+volumeFunction() {
+  return () => this.baseArea() * this.height;
+}
+};
+rectangle3D.volumeFunction()();
+GOAL:
+60
+YOURS:
+60
+```
+
+The rules for JavaScript's scoping are complicated, especially the rules that concern this. Fortunately, the rule for arrow functions is simple: arrow functions always inherit the scope they were defined in. This makes them ideal for use with callback functions, where we often want to reference variables in the function or object that created the callback function.
+
+## Lesson 20
+
+## Lesson 21
+
+## Lesson 22
