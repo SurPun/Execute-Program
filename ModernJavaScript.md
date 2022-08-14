@@ -1883,4 +1883,163 @@ RESULT:
 [2, 3]
 ```
 
-## Lesson 18
+## Lesson 18 Modern JavaScript: Nested destructuring
+
+We can destructure nested data, like nested arrays (arrays inside other arrays).
+
+```js
+const dataPoints = [
+  [10, 20],
+  [30, 40]
+];
+const [[x1, y1], [x2, y2]] = dataPoints;
+x1;
+RESULT:
+10
+```
+
+1.
+```js
+const dataPoints = [
+  [10, 20],
+  [30, 40]
+];
+const [[x1]] = dataPoints;
+x1;
+RESULT:
+10
+
+const dataPoints = [
+  [10, 20],
+  [30, 40]
+];
+const [[, y1]] = dataPoints;
+y1;
+RESULT:
+20
+
+const dataPoints = [
+  [10, 20],
+  [30, 40]
+];
+const [, [x2]] = dataPoints;
+x2;
+RESULT:
+30
+```
+Use destructuring to extract the value 40 from the nested array below. Destructure it into a variable named y2.
+
+2.
+```js
+const dataPoints = [
+  [10, 20],
+  [30, 40]
+];
+const [[], [, y2]] = dataPoints;
+y2;
+GOAL:
+40
+YOURS:
+40
+```
+
+We can also destructure nested objects.
+
+```js
+const user = {
+  name: 'Amir',
+  address: {
+    city: 'Paris',
+  },
+};
+const {address: {city}} = user;
+city;
+RESULT:
+'Paris'
+```
+
+In the last example, the address: part only exists so that we can access parts of the address. It doesn't define an address variable. Let's double-check that by re-running the code above, then trying to access the address variable.
+
+(The next example causes an error. You can type error when code will result in an error.)
+
+3.
+```js
+const user = {
+  name: 'Amir',
+  address: {
+    city: 'Paris',
+  },
+};
+const {address: {city}} = user;
+address;
+RESULT:
+ReferenceError: address is not defined
+```
+
+If we want to get the entire address object and also get the city, we can ask for that explicitly, as in the next example. Pay close attention to the destructuring syntax here!
+
+4.
+```js
+const user = {
+  name: 'Amir',
+  address: {
+    city: 'Paris',
+  },
+};
+const {address, address: {city}} = user;
+[city, address];
+RESULT:
+['Paris', {city: 'Paris'}]
+```
+
+Use destructuring to extract Betty's cat's name, which is stored in a nested object. Store it in the name variable. (That variable name matches the name key in cat, which makes the destructuring easier than it would be if it didn't match.)
+
+5.
+```js
+const user = {
+  name: 'Betty',
+  cat: {
+    name: 'Keanu',
+    age: 2,
+  },
+};
+const {cat: {name}} = user;
+name;
+GOAL:
+'Keanu'
+YOURS:
+'Keanu'
+```
+
+Destructuring works on arrays and objects nested inside each other. (Be careful of the , below. It skips the first array element, so we're only extracting the second one.)
+
+6.
+```js
+const users = [{name: 'Amir'}, {name: 'Betty'}];
+const [, {name}] = users;
+name;
+RESULT:
+'Betty'
+```
+
+What about when we want to destructure multiple different source variables? We could write one const (or let) per object. However, there's also a trick to doing it in one line. We can destructure multiple values by wrapping them in an array, then immediately destructuring it.
+
+7.
+```js
+const user = {name: 'Amir'};
+const address = {city: 'Paris'};
+const [{name}, {city}] = [user, address];
+[name, city];
+RESULT:
+['Amir', 'Paris']
+```
+
+Finally, let's consider why destructuring is useful. The most obvious benefit is that it makes code shorter. But merely shortening code isn't inherently good. Many methods for shortening code also make it less readable. In the case of destructuring, there's another, more subtle benefit: predictability.
+
+Some of JavaScript's array and object methods change the array or object, but others don't. For example, the array methods filter and slice don't change the array that they're called on, but the sort and reverse methods do change the array. To use these methods effectively, we have to memorize which methods work in which ways. (We have a separate JavaScript Arrays course that can help with that!)
+
+Destructuring can never modify the objects that we destructure, so we never have to ask "will this modify the array or not?" When someone else reads our destructuring code later, that's one less thing that they have to think about.
+
+(There is technically one exception: if we're destructuring a getter property with side effects that change some object, then destructuring will trigger those side effects. But getters shouldn't have side effects in the first place, so hopefully you'll never encounter that!)
+
+## Lesson 19
