@@ -2523,7 +2523,135 @@ RESULT:
 'f'
 ```
 
-## Lesson 22
+## Lesson 22 Modern JavaScript: JSON stringify and parse
+
+In the past, we had to use third-party libraries to read and write JSON. Fortunately, modern versions of JavaScript include built-in JSON support.
+
+```js
+JSON.stringify({a: 2}) === '{"a":2}';
+RESULT:
+true
+
+JSON.parse('{"a": 1, "b"   :   2}');
+RESULT:
+{a: 1, b: 2}
+```
+
+The stringify method turns an object into a JSON string. By default, it will pack the JSON tightly. For example, there's no space after the : in the stringified object above. The parse method turns a JSON string back into an object.
+
+By combining the two methods, we can "round-trip" an object to JSON and back, ending up with the same object that we started with.
+
+1.
+```js
+JSON.parse(JSON.stringify({name: 'Amir'}));
+RESULT:
+{name: 'Amir'}
+```
+
+If we try to parse a string that isn't valid JSON, we'll get an error. (You can type error when a code example will throw an error.)
+
+2.
+```js
+JSON.parse('*@& oh no &@*')
+RESULT:
+SyntaxError: Unexpected token * in JSON at position 0
+```
+
+JSON stands for "JavaScript object notation". However, not all JavaScript object syntax is valid JSON.
+
+The full details of JSON's syntax are out of scope for this course, but we'll examine one quick example to make the point. JavaScript object keys don't have to be quoted, but JSON keys do require quotes. If we try to parse a JSON string with unquoted object keys, we'll get an error.
+
+3.
+```js
+JSON.parse('{"a": 1}');
+RESULT:
+{a: 1}
+
+JSON.parse('{a: 1}')
+RESULT:
+SyntaxError: Unexpected token a in JSON at position 1
+```
+
+The JSON methods will parse and stringify any JSON-compatible value, not just objects. They work on arrays, strings, numbers, etc.
+
+4.
+```js
+JSON.parse(JSON.stringify([1, 2]));
+RESULT:
+[1, 2]
+
+JSON.parse(JSON.stringify('hello'));
+RESULT:
+'hello'
+
+JSON.parse(JSON.stringify([true, null]));
+RESULT:
+[true, null]
+```
+
+undefined is an important special case because it's not allowed in JSON. When we call stringify, any undefineds in the original object will be turned into nulls. If we then parse the resulting JSON, we'll get a null out. The JSON contains no hints that there ever was an undefined.
+
+```js
+JSON.stringify([1, undefined, 2]);
+RESULT:
+'[1,null,2]'
+```
+
+5.
+```js
+JSON.parse(JSON.stringify([1, undefined, 2]));
+RESULT:
+[1, null, 2]
+```
+
+JSON can't represent circular objects (objects that reference themselves). Here's an example of a circular object.
+
+```js
+const circularObject = {};
+circularObject.someKey = circularObject;
+circularObject;
+RESULT:
+{someKey: (circular reference)}
+```
+
+6.
+```js
+const circularObject = {};
+circularObject.someKey = circularObject;
+JSON.stringify(circularObject);
+RESULT:
+TypeError: Converting circular structure to JSON
+    --> starting at object with constructor 'Object'
+    --- property 'someKey' closes the circle
+```
+
+Sometimes, we'll want an object to specify how it should be serialized to JSON. We can do that by putting a function in its toJSON property. JSON.stringify will call that function and use its result rather than the original object.
+
+```js
+const user = {
+  name: 'Amir',
+  toJSON: () => 'This is Amir!'
+};
+JSON.parse(JSON.stringify(user));
+RESULT:
+'This is Amir!'
+```
+
+The toJSON function isn't responsible for actually converting to JSON; stringify will still do that part. Instead, toJSON returns a new JavaScript object to be serialized in place of the original.
+
+7.
+```js
+JSON.parse(
+  JSON.stringify(
+    {
+      name: 'Amir',
+      toJSON: () => ({thisWas: 'Amir'})
+    }
+  )
+);
+RESULT:
+{thisWas: 'Amir'}
+```
 
 ## Lesson 23
 
