@@ -2438,6 +2438,95 @@ JavaScript's native object system is prototype-based, which is unusual and there
 
 When possible, we recommend using classes rather than prototypes because they're more widely understood. Occasionally, you'll be forced to dig down into the prototype system, especially when dealing with older JavaScript code or very unusual kinds of objects.
 
-## Lesson 21
+## Lesson 21 Modern JavaScript: Function name property
+
+Normally, defining a function automatically assigns it to a variable. If we declare a function f(), we can use the variable f to refer to our function.
+
+```js
+function f() { return 5; }
+f();
+RESULT:
+5
+```
+
+Functions declared like this have a name property. As you might expect, the name of a function f() is the string 'f'.
+
+1.
+```js
+function f() { return 5; }
+f.name;
+RESULT:
+'f'
+```
+
+Functions don't have to have names, though. If a function is created without a name, its name will be the empty string, ''. These are called "anonymous" functions.
+
+2.
+```js
+(
+  function() { return 5; }
+).name;
+RESULT:
+''
+```
+
+If we immediately assign an anonymous function to a variable, that variable's name will become the function's name. (Functions created like this are still called "anonymous" because there's no name specified in the function() { ... } definition.)
+
+3.
+```js
+const f = function() { return 5; };
+f.name;
+RESULT:
+'f'
+```
+
+The function remembers its original name, even if it's assigned to a different variable.
+
+4.
+```js
+const f = function() { return 5; };
+const f2 = f;
+f2.name;
+RESULT:
+'f'
+
+const g = function() { return 5; };
+const functions = [g];
+functions[0].name;
+RESULT:
+'g'
+```
+
+Anonymous functions only get a name if they're assigned directly to a variable. If we put the function in an array, for example, it won't get the array's name; instead, it will have no name.
+
+5.
+```js
+const functions = [function() { return 5; }];
+functions[0].name;
+RESULT:
+''
+```
+
+Arrow function syntax doesn't give us any place to specify the function's name. As a result, arrow functions are always anonymous. However, like normal functions, they do get a name if they're assigned directly to a variable.
+
+6.
+```js
+(
+  () => 1
+).name;
+RESULT:
+''
+
+const f = () => 1;
+f.name;
+RESULT:
+'f'
+```
 
 ## Lesson 22
+
+## Lesson 23
+
+## Lesson 24
+
+## Lesson 25
