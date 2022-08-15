@@ -2653,7 +2653,167 @@ RESULT:
 {thisWas: 'Amir'}
 ```
 
-## Lesson 23
+## Lesson 23 Modern JavaScript: Spread
+
+We've seen ... used to provide variable numbers of arguments to functions:
+
+1.
+```js
+function add(x, y) {
+  return x + y;
+}
+const numbers = [1, 2];
+add(...numbers);
+RESULT:
+3
+```
+
+We can also use ... when constructing an array. There, ... means "include that array's elements into this array".
+
+```js
+const numbers = [
+  1,
+  ...[2, 3],
+  4,
+];
+numbers;
+RESULT:
+[1, 2, 3, 4]
+```
+
+2.
+```js
+const middleNumbers = [6, 7];
+const numbers = [5, ...middleNumbers, 8];
+numbers;
+RESULT:
+[5, 6, 7, 8]
+
+```
+
+When we use ... in this way, it's called the "spread" operator. (We're "spreading" one array's elements across another array.)
+
+We can spread multiple arrays in a single expression. The elements will occur in the order they were specified.
+
+3.
+```js
+const numbers1 = [1, 2];
+const numbers2 = [3, 4];
+[...numbers1, ...numbers2];
+RESULT:
+[1, 2, 3, 4]
+
+const numbers1 = [1, 2];
+const numbers2 = [3, 4];
+[...numbers2, ...numbers1];
+RESULT:
+[3, 4, 1, 2]
+```
+
+In the past, we'd merge arrays using their concat method.
+
+```js
+const nonAdmins = [
+  {name: 'Amir'},
+];
+const admins = [
+  {name: 'Betty'},
+];
+const allUsers = nonAdmins.concat(admins);
+allUsers.map(user => user.name);
+RESULT:
+['Amir', 'Betty']
+```
+
+Spreading is generally considered a more readable alternative:
+
+4.
+```js
+const nonAdmins = [
+  {name: 'Amir'},
+];
+const admins = [
+  {name: 'Betty'},
+];
+const allUsers = [...nonAdmins, ...admins];
+allUsers.map(user => user.name);
+RESULT:
+['Amir', 'Betty']
+```
+
+Spreading also works with objects. There, it means "include all of that object's properties into this object".
+
+```js
+const amir = {
+  name: 'Amir',
+  age: 36,
+};
+const amirWithEmail = {
+  ...amir,
+  email: 'amir@example.com'
+};
+amirWithEmail;
+RESULT:
+{age: 36, email: 'amir@example.com', name: 'Amir'}
+```
+
+Order matters when setting object keys. When defining an object literal, the last value assigned to a key wins:
+
+5.
+```js
+const user = {
+  name: 'Amir',
+  age: 36,
+  name: 'Betty',
+};
+user.name;
+RESULT:
+'Betty'
+```
+
+Order of object keys also matters with spread. The last instance of a key wins, even if it comes from a spread.
+
+6.
+```js
+const user1 = {
+  name: 'Amir',
+  age: 36
+};
+const user2 = {
+  name: 'Betty',
+};
+({...user1, ...user2});
+RESULT:
+{age: 36, name: 'Betty'}
+
+const user1 = {
+  name: 'Amir',
+  age: 36
+};
+const user2 = {
+  name: 'Betty',
+};
+({...user2, ...user1});
+RESULT:
+{age: 36, name: 'Amir'}
+```
+
+Use spread syntax to write a mergeObjects function that combines two objects.
+
+7.
+```js
+function mergeObjects(obj1, obj2) {
+  return {...obj1, ...obj2};
+}
+mergeObjects(
+  {name: 'Amir', age: 36},
+  {name: 'Betty'}
+);
+GOAL:
+{age: 36, name: 'Betty'}
+YOURS:
+{age: 36, name: 'Betty'}
+```
 
 ## Lesson 24
 
