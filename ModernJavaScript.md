@@ -2270,7 +2270,173 @@ YOURS:
 
 The rules for JavaScript's scoping are complicated, especially the rules that concern this. Fortunately, the rule for arrow functions is simple: arrow functions always inherit the scope they were defined in. This makes them ideal for use with callback functions, where we often want to reference variables in the function or object that created the callback function.
 
-## Lesson 20
+## Lesson 20 Modern JavaScript: Classes
+
+JavaScript gained a new class syntax in 2015, making it more familiar to programmers who already know common object-oriented languages like Java, C#, Python, or Ruby.
+
+If you already know an object-oriented language, this first lesson on classes might be very easy. But we'll soon turn to issues that are specific to JavaScript's version of classes.
+
+Classes describe the shape of an object: what properties and methods (functions) it has. Class method definitions look like the shorthand method syntax that we already saw in literal objects: methodName() { ... }.
+
+We construct an instance of a class with new: new MyClass(). The instance is an object with all of the properties and methods (functions) specified by the class.
+
+1.
+```js
+class MsFluff {
+  name() {
+    return 'Ms. Fluff';
+  }
+}
+new MsFluff().name();
+RESULT:
+'Ms. Fluff'
+```
+
+Classes can have constructors, which are special methods that initialize the object.
+
+2.
+```js
+class MsFluff {
+  constructor() {
+    this.name = 'Ms. Fluff';
+  }
+}
+new MsFluff().name;
+RESULT:
+'Ms. Fluff'
+```
+
+But why define a MsFluff class when we can define a more generic Cat? Then we can use that class to make multiple different cats.
+
+3.
+```js
+class Cat {
+  constructor(name) {
+    this.name = name;
+  }
+}
+[new Cat('Ms. Fluff').name, new Cat('Keanu').name];
+RESULT:
+['Ms. Fluff', 'Keanu']
+```
+
+Define a Cat class whose constructor takes both a name and an age. Store the name and age as properties on this.
+
+4.
+```js
+class Cat {
+  constructor(name, age) {
+    this.name = name;
+    this.age = age;
+  }
+}
+[
+  new Cat('Ms. Fluff', 4),
+  new Cat('Keanu', 2),
+];
+GOAL:
+[{age: 4, name: 'Ms. Fluff'}, {age: 2, name: 'Keanu'}]
+YOURS:
+[{age: 4, name: 'Ms. Fluff'}, {age: 2, name: 'Keanu'}]
+```
+
+Ms. Fluff and Keanu are "instances" of the Cat class. When we create them with new Cat(...), we're "instantiating" the class into a specific instance.
+
+Use new to instantiate an array of two cats: 'Ms. Fluff' and 'Keanu'.
+
+5.
+```js
+class Cat {
+  constructor(name) {
+    this.name = name;
+  }
+}
+'Keanu')];
+const cats = [new Cat('Ms. Fluff'), new Cat('Keanu')];
+cats.map(cat => cat.name);
+GOAL:
+['Ms. Fluff', 'Keanu']
+YOURS:
+['Ms. Fluff', 'Keanu']
+```
+
+Classes can contain methods, which are functions that show up on the individual instances. Methods can access the object's properties by doing this.somePropertyName.
+
+6.
+```js
+class Cat {
+  constructor(name, vaccinated) {
+    this.name = name;
+    this.vaccinated = vaccinated;
+  }
+
+  needsVaccination() {
+    return !this.vaccinated;
+  }
+}
+[
+  new Cat('Ms. Fluff', true).needsVaccination(),
+  new Cat('Keanu', false).needsVaccination(),
+];
+RESULT:
+[false, true]
+```
+
+Define an area method on the Rectangle class.
+
+7.
+```js
+class Rectangle {
+  constructor(width, height) {
+    this.width = width;
+    this.height = height;
+  }
+​
+return this.width * this.height;
+  area() {
+    return this.width * this.height;
+  }
+}
+​
+[new Rectangle(3, 4).area(), new Rectangle(5, 6).area()];
+GOAL:
+[12, 30]
+YOURS:
+[12, 30]
+```
+
+We can't call instance methods directly on the class itself. If we try, we'll get an error. (You can type error when a code example will throw an error.)
+
+8.
+```js
+class Cat {
+  constructor(name, vaccinated) {
+    this.name = name;
+    this.vaccinated = vaccinated;
+  }
+
+  needsVaccination() {
+    return !this.vaccinated;
+  }
+}
+Cat.needsVaccination();
+RESULT:
+TypeError: Cat.needsVaccination is not a function
+```
+
+The new keyword is required when instantiating classes: new Cat(...). If we try to create a Cat by calling the class like a function, we'll get an error.
+
+9.
+```js
+class Cat { }
+Cat();
+RESULT:
+TypeError: Class constructor Cat cannot be invoked without 'new'
+```
+
+JavaScript's native object system is prototype-based, which is unusual and therefore unfamiliar to a lot of programmers. We haven't mentioned that object system here precisely because it's so unusual. Prototypes are better viewed as an advanced topic, to be studied once the more "normal" parts of modern JavaScript are familiar. However, the class-based syntax in this lesson is only "syntactic sugar": it's a new syntax layered over the older prototype-based object system.
+
+When possible, we recommend using classes rather than prototypes because they're more widely understood. Occasionally, you'll be forced to dig down into the prototype system, especially when dealing with older JavaScript code or very unusual kinds of objects.
 
 ## Lesson 21
 
