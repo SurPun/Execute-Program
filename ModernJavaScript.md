@@ -2815,6 +2815,210 @@ YOURS:
 {age: 36, name: 'Betty'}
 ```
 
-## Lesson 24
+## Lesson 24 Modern JavaScript: Sets
+
+Sometimes, we want to know whether a value is in a list of other values. We can use an array:
+
+1.
+```js
+const names = ['Amir', 'Betty', 'Cindy'];
+names.includes('Betty');
+RESULT:
+true
+```
+
+This works, but there's a potential performance problem hiding here. The includes method loops through the entire array, checking each element. If there are 10,000 elements, it will loop up to 10,000 times.
+
+(The technical way to say that is: includes is O(n). If there are n elements, then includes has to do n comparisons while checking each one. In some cases it will find the element early in the array and stop, but in other cases it will have to check every element.)
+
+JavaScript's Set data type is a better solution to this problem. A JavaScript set is a collection, it's ordered, and it contains only unique values. We'll look at each of those in order.
+
+First, sets are collections: they contain a bunch of JavaScript values. We can give a set an initial set of values in its constructor. Then we can add() more values later. We can ask a set whether it has() a given value.
+
+2.
+```js
+const names = new Set(['Amir', 'Betty', 'Cindy']);
+names.has('Amir');
+RESULT:
+true
+
+const names = new Set(['Amir', 'Betty', 'Cindy']);
+names.has('Dalili');
+RESULT:
+false
+
+const names = new Set(['Amir', 'Betty', 'Cindy']);
+names.add('Dalili');
+names.has('Dalili');
+RESULT:
+true
+```
+
+Second, JavaScript sets are ordered. If we examine the elements in the set, they'll always come back in the order that they were inserted.
+
+To get the elements out of the set, we can use the values method. It returns an iterator, which we haven't covered yet. We can ignore the iterator for now by converting it into an array with Array.from().
+
+```js
+const names = new Set(['Amir', 'Betty']);
+Array.from(names.values());
+RESULT:
+['Amir', 'Betty']
+```
+
+3.
+```js
+const names = new Set(['Betty', 'Amir']);
+Array.from(names.values());
+RESULT:
+['Betty', 'Amir']
+```
+
+Sets are mathematical objects studied in set theory, the modern form of which dates to the 1870s. Most programming languages, including JavaScript, provide a set type with operations that would've been familiar to the set theorist Georg Cantor (1845 - 1918).
+
+Unlike mathematical sets, and unlike other programming languages' sets, JavaScript's sets are ordered, as we saw above. This isn't a case of JavaScript being weird in a way that's confusing. If anything, preserving order is desirable; it's one less uncertainty to track in our code.
+
+It's important to keep this difference in mind if you already know other languages, or if you learn other languages in the future. In JavaScript, you can count on a set to remember the elements' insertion order. In other languages, you can't count on that, and elements can come back in any order.
+
+The third property of sets is: they contain only unique values. If we add a value that already exists in the set, nothing happens; the set is unchanged.
+
+4.
+```js
+const names = new Set(['Amir']);
+names.add('Betty');
+names.add('Betty');
+Array.from(names.values());
+RESULT:
+['Amir', 'Betty']
+```
+
+Elements can be deleted from a set with the delete method. And the entire set can be cleared with clear.
+
+5.
+```js
+const names = new Set(['Amir', 'Betty']);
+names.delete('Betty');
+Array.from(names.values());
+RESULT:
+['Amir']
+
+const names = new Set(['Amir', 'Betty']);
+names.clear();
+Array.from(names.values());
+RESULT:
+[]
+```
+
+Sets have a size property that returns the number of items in the set.
+
+6.
+```js
+const names = new Set(['Amir', 'Betty']);
+names.size;
+RESULT:
+2
+```
+
+A set's size reflects the number of unique values that it holds. Duplicates passed to the constructor or added with .add don't contribute to the size.
+
+7.
+```js
+const names = new Set(['Amir', 'Betty', 'Amir']);
+names.size;
+RESULT:
+2
+
+const names = new Set(['Amir', 'Betty']);
+names.add('Betty');
+names.size;
+RESULT:
+2
+```
+
+That's everything that a set can do! But the examples so far have been a bit deceptive: we keep converting the set into an array. The main power of sets isn't in converting them back into arrays; it's that calling has is very fast.
+
+An array's includes method slows down as the array gets larger. But sets don't have that problem! A set's has() method is O(1): it always takes the same amount of time regardless of how many elements there are.
+
+(As is often the case, that's true in practice, but it's false in the most literal sense. There are situations where has() could theoretically perform as badly as an array does. But they're so vanishingly rare that few of us will ever encounter them in our entire careers.)
+
+Let's run some benchmarks to see the performance difference in reality:
+
+- We'll use a benchmark function that calls another function a million times, then returns how many milliseconds those calls took. (We call the function a million times to make sure that it takes a measurable amount of time.)
+- We'll benchmark an array and a set, each with about a million elements.
+- We won't benchmark the cost of building the array and the set; we only care about the cost of calling the includes and has methods.
+
+```js
+function benchmark(f) {
+  const start = new Date().getTime();
+  for (let i=0; i<1000000; i++) {
+    f();
+  }
+  const end = new Date().getTime();
+  return end - start;
+}
+
+/* This is a JavaScript trick that means "make an array of a million random
+ * numbers". These array details are covered in our "JavaScript Arrays"
+ * course. */
+const largeArray = new Array(1000000).fill(undefined).map(() => Math.random());
+const largeSet = new Set(largeArray);
+
+// Benchmark the array's includes method vs. the set's has method.
+[
+  benchmark(() => largeArray.includes(5)),
+  benchmark(() => largeSet.has(5)),
+];
+RESULT:
+[9969, 16]
+```
+
+Unlike the other examples in this course, we didn't actually run the one above in your browser. If we did that, then we (as the authors of this lesson) couldn't know exactly what numbers would come out.
+
+But those numbers, 9969 and 16, are the actual benchmarked times, in milliseconds, that we got on our machine! It took 623 times as long to call includes vs. has. If you run the above code in your browser's developer console, you should see a similar ratio. (You'll need to put a console.log(...) around the final array of times.)
+
+Now let's prove that a set's has method is always fast, regardless of the number of elements. The next example reuses the benchmark function definition above, as well as the largeSet data. We compare the performance of has called on a 1-element lonelySet to the performance on the million-element largeSet.
+
+```js
+const lonelySet = new Set([1]);
+[
+  benchmark(() => lonelySet.has(5)),
+  benchmark(() => largeSet.has(5)),
+];
+RESULT:
+[11, 12]
+```
+
+Calling has took the same amount of time for a single-element set that it took for a million-element set! Again, those are the numbers that we got, but you should see similar results if you try it yourself.
+
+Internally, Execute Program uses sets in a few different places. All of them could be replaced with arrays for a moderate performance penalty, but why take the penalty when sets have such a simple interface?
+
+For example, every code example in Execute Program has an ID, and all example IDs must be unique. To check for that uniqueness, we loop over the example IDs, adding them to a set. If we ever encounter an ID that's already in the set, then we know that we're seeing it for a second time, so it's a duplicate. In that case, we throw an exception to signal the error to ourselves.
+
+Write a hasDuplicates function. It should use a set to decide whether an array of numbers has any duplicates. It should return true if there are duplicates; otherwise it should return false.
+
+There are multiple ways to solve this problem with sets. Here's one possible solution. Begin with an empty set. Then, for each number, check for whether the number is in the set. If it's in the set then we must have seen it earlier in the array, so it's a duplicate, so we can return true immediately. If we get to the end of the array then we never saw any number twice, so we can return false.
+
+8.
+```js
+function hasDuplicates(numbers) {
+  const set = new Set();
+  for (const n of numbers) {
+    if (set.has(n)) {
+      return true;
+    }
+    set.add(n);
+  }
+  return false;
+}
+[
+  hasDuplicates([]),
+  hasDuplicates([1, 2, 3]),
+  hasDuplicates([10, 20, 20]),
+  hasDuplicates([100, 200, 300, 100]),
+];
+GOAL:
+[false, false, true, true]
+YOURS:
+[false, false, true, true]
+```
 
 ## Lesson 25
