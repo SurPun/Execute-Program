@@ -3251,7 +3251,138 @@ That class syntax has since been superseded by a very clever mechanism called Re
 
 React hooks' success isn't an argument that "classes are bad". But it does show us that, even in cases where classes model a problem well, there might be an even better model. Execute Program itself contains a number of classes: User, Graph (a graph data structure), Parser (a parser for our course definition markup language), etc. But most of the application logic is contained in regular functions, not in classes.
 
-## lesson 26
+## lesson 26 Modern JavaScript: String keyed methods
+
+We've seen shorthand methods in object literals:
+
+1.
+```js
+const user = {
+  name() { return 'Amir'; }
+};
+user.name();
+RESULT:
+'Amir'
+```
+
+When we use that syntax, the method name is subject to the normal limitations on JavaScript variable names. It can't contain spaces, for example.
+
+```js
+const user = {
+  name of the user() { return 'Amir' }
+}
+user.name()
+RESULT:
+SyntaxError: on line 2: Unexpected token, expected ","
+```
+
+However, if we put quotes around the method's name, then it can contain spaces and even punctuation!
+
+If a method name contains spaces or punctuation, then we can't call it with the usual someObject.methodName syntax. We'll have to use someObject['methodName'].
+
+2.
+```js
+const user = {
+  'name of the ~user~'() { return 'Betty'; }
+};
+user['name of the ~user~']();
+RESULT:
+'Betty'
+```
+
+This method definition syntax is called "string keyed methods" because we're using the normal JavaScript string syntax to define the method's name (its key in the object).
+
+Modern JavaScript has good Unicode support, so ordinary methods work with non-English characters as well. For example, we can name our method "名前", the Japanese word for "name".
+
+3.
+```js
+const user = {
+  名前() { return 'Betty'; }
+};
+user.名前();
+RESULT:
+'Betty'
+```
+
+However, we can't use normal syntax to name the method 名前。. The "。" character is a Japanese period, which is punctuation, and punctuation isn't allowed in JavaScript identifiers. Including that character will result in an error. (You can type error when a code example will throw an error.)
+
+```js
+const user = {
+  名前。() { return 'Betty' }
+}
+user.名前。()
+RESULT:
+SyntaxError: on line 2: Unexpected character '。'.
+```
+
+With string keyed methods, we can define that "名前。" method.
+
+4.
+```js
+const user = {
+  '名前。'() { return 'Betty'; }
+};
+user['名前。']();
+RESULT:
+'Betty'
+```
+
+String keyed methods also work in class definitions. This is a recurring theme: syntax that works in object literal methods will generally work inside class definitions as well.
+
+5.
+```js
+class User {
+  constructor(name) {
+    this.name = name;
+  }
+
+  'name of the user'() {
+    return this.name;
+  }
+}
+
+new User('Marie')['name of the user']();
+RESULT:
+'Marie'
+
+class User {
+  constructor(名前) {
+    this.名前 = 名前;
+  }
+
+  '名前。'() {
+    return this.名前;
+  }
+}
+
+new User('Marie')['名前。']();
+RESULT:
+'Marie'
+```
+
+Define a User class with a method named "is admin", including the space. Your class should accept an isAdmin argument to the constructor, which is then returned by the "is admin" method.
+
+6.
+```js
+class User {
+  constructor(isAdmin) {
+    this.isAdmin = isAdmin;
+  }
+  
+  'is admin'() {
+    return this.isAdmin;
+  }
+}
+const adminFlags = [
+  new User(false)['is admin'](),
+  new User(true)['is admin'](),
+];
+adminFlags;
+GOAL:
+[false, true]
+YOURS:
+[false, true]
+```
 
 ## Lesson 27
 
