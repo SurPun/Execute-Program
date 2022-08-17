@@ -3384,7 +3384,130 @@ YOURS:
 [false, true]
 ```
 
-## Lesson 27
+## Lesson 27 Modern JavaScript: Class scoping
+
+We usually define classes at the top level of a module. However, classes follow the same scoping rules as regular variables. We can define them inside a function, or even inside a conditional.
+
+1.
+```js
+function createKoko() {
+  class Gorilla {
+    constructor(name) {
+      this.name = name;
+    }
+  }
+  return new Gorilla('Koko');
+}
+createKoko().name;
+RESULT:
+'Koko'
+
+function createGorilla(name) {
+  if (name === undefined) {
+    return undefined;
+  } else {
+    class Gorilla {
+      constructor(name) {
+        this.name = name;
+      }
+    }
+    return new Gorilla(name);
+  }
+}
+[createGorilla(undefined), createGorilla('Koko').name];
+RESULT:
+[undefined, 'Koko']
+```
+
+Just to be clear: there are very few cases where a class should be defined in a function. There are even fewer (and maybe none) where a class should be defined inside a conditional. But JavaScript allows us to do these things!
+
+Here's a much better version of the previous code example, with the Gorilla class defined at the top level of the module. Notice how much easier it is to read now that the Gorilla is defined separately.
+
+2.
+```js
+class Gorilla {
+  constructor(name) {
+    this.name = name;
+  }
+}
+
+function createGorilla(name) {
+  if (name === undefined) {
+    return undefined;
+  } else {
+    return new Gorilla(name);
+  }
+}
+
+[createGorilla(undefined), createGorilla('Koko').name];
+RESULT:
+[undefined, 'Koko']
+```
+
+When classes are defined dynamically, like inside a function, the class definition itself can see all of the variables that are currently in scope. For example, a class defined inside a function can reference the function's arguments.
+
+In the next example, notice that the class's constructor doesn't take a name argument. Instead, the class is "capturing" the containing function's name argument!
+
+3.
+```js
+function createGorilla(name) {
+  class Gorilla {
+    constructor() {
+      this.name = name;
+    }
+  }
+  return new Gorilla();
+}
+createGorilla('Michael').name;
+RESULT:
+'Michael'
+```
+
+There's one scoping rule that will surprise programmers who know other object-oriented languages: we can't define a class inside another class. That will cause an error, whether we use the class or not.
+
+4.
+```js
+class Zoo {
+  class Gorilla {
+    constructor(name) {
+      this.name = name
+    }
+  }
+}
+RESULT:
+SyntaxError: on line 2: Unexpected token
+```
+
+Classes are only visible inside the scope where they were defined, just like variables defined with let or const. If we try to reference a class outside of its scope, we'll get an error.
+
+5.
+```js
+if (true) {
+  const x = 1;
+}
+x;
+RESULT:
+ReferenceError: x is not defined
+
+function createGorilla() {
+  class Gorilla {
+    constructor(name) {
+      this.name = name;
+    }
+  }
+  return new Gorilla('Koko');
+}
+new Gorilla('Koko');
+RESULT:
+ReferenceError: Gorilla is not defined
+
+if (true) {
+  class Cat { }
+}
+new Cat();
+RESULT:
+ReferenceError: Cat is not defined
+```
 
 ## Lesson 28
 
