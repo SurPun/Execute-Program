@@ -3021,4 +3021,242 @@ YOURS:
 [false, false, true, true]
 ```
 
-## Lesson 25
+## Lesson 25 Modern JavaScript: Extending classes
+
+JavaScript classes can extend (inherit from) other classes: class MySubclass extends MySuperclass. The subclass will have all of the properties and methods of the superclass, plus any properties and methods that it defines itself.
+
+1.
+```js
+class Animal {
+  constructor(name) {
+    this.name = name;
+  }
+}
+
+class Cat extends Animal {
+}
+
+new Cat('Ms. Fluff').name;
+RESULT:
+'Ms. Fluff'
+```
+
+The superclass and subclass can define their own separate constructors. That lets us centralize shared setup code in the superclass, avoiding duplication in its subclasses. The subclass' constructor calls the superclass' constructor with super(), passing whatever arguments the superclass' constructor requires.
+
+2.
+```js
+class Animal {
+  constructor(name) {
+    this.name = name;
+  }
+}
+
+class Cat extends Animal {
+  constructor(name) {
+    super(name + ' the cat');
+  }
+}
+
+new Cat('Ms. Fluff').name;
+RESULT:
+'Ms. Fluff the cat'
+
+class Animal {
+  constructor(legCount) {
+    this.legCount = legCount;
+  }
+
+  canWalk() {
+    return this.legCount > 0;
+  }
+}
+
+class Worm extends Animal {
+  constructor() {
+    super(0);
+  }
+}
+
+class Dog extends Animal {
+  constructor() {
+    super(4);
+  }
+}
+
+[new Worm().canWalk(), new Dog().canWalk()];
+RESULT:
+[false, true]
+```
+
+Calling super is mandatory: if the subclass has a constructor, it has to call super at some point during the constructor. Otherwise, newing the subclass will cause an error. This rule holds even when the superclass doesn't actually define a constructor; we still have to call super!
+
+```js
+class Animal { }
+class Cat extends Animal {
+  constructor(name) {
+    this.name = name;
+  }
+}
+new Cat('Ms. Fluff').name;
+RESULT:
+ReferenceError: Must call super constructor in derived class before accessing 'this' or returning from derived constructor
+```
+
+We can use instanceof to check for whether an object is an instance of a given class.
+
+3.
+```js
+class Cat {
+}
+const cat = new Cat();
+cat instanceof Cat;
+RESULT:
+true
+
+class Cat {
+}
+'cat' instanceof Cat;
+RESULT:
+false
+
+class Cat {
+}
+true instanceof Cat;
+RESULT:
+false
+```
+
+instanceof understands subclasses: x instanceof Y is true when x is an instance of any subclass of Y.
+
+4.
+```js
+class Animal { }
+class Cat extends Animal { }
+const cat = new Cat();
+cat instanceof Animal;
+RESULT:
+true
+```
+
+We can inherit from classes that inherited from other classes, and so on; there's no limit.
+
+5.
+```js
+class Animal {
+  constructor(legCount) {
+    this.legCount = legCount;
+  }
+
+  canWalk() {
+    return this.legCount > 0;
+  }
+}
+
+class Dog extends Animal {
+  constructor(runSpeedKmPerHour) {
+    super(4);
+    this.runSpeedKmPerHour = runSpeedKmPerHour;
+  }
+}
+
+class Greyhound extends Dog {
+  constructor() {
+    super(65);
+  }
+}
+
+class Pug extends Dog {
+  constructor() {
+    super(5);
+  }
+}
+
+[
+  new Greyhound().canWalk(),
+  new Greyhound().runSpeedKmPerHour,
+  new Pug().canWalk(),
+  new Pug().runSpeedKmPerHour,
+];
+RESULT:
+[true, 65, true, 5]
+
+new Pug() instanceof Dog;
+RESULT:
+true
+
+new Pug() instanceof Animal;
+RESULT:
+true
+```
+
+Subclasses can define properties or methods that already exist on the superclass. When that happens, the subclass' version "overrides", or replaces, the superclass' version.
+
+6.
+```js
+class Bird {
+  speak() {
+    return 'chirp';
+  }
+}
+class Crow extends Bird {
+  speak() {
+    return 'CAW';
+  }
+}
+[new Bird().speak(), new Crow().speak()];
+RESULT:
+['chirp', 'CAW']
+```
+
+Define an Admin class that inherits from User. Its constructor should call super, passing along the relevant arguments. It should also set the admin's isAdmin flag to true.
+
+7.
+```js
+class User {
+  constructor(name, email) {
+    this.name = name;
+    this.email = email;
+    this.isAdmin = false;
+  }
+}
+class Admin extends User {
+  constructor(name, email) {
+    super(name, email);
+    this.isAdmin = true;
+  }
+}
+const admin = new Admin('Amir', 'amir@example.com');
+[admin.name, admin.email, admin.isAdmin];
+GOAL:
+['Amir', 'amir@example.com', true]
+YOURS:
+['Amir', 'amir@example.com', true]
+```
+
+Some languages have "multiple inheritance": they allow a class to inherit from multiple other classes at once. Python and C++ are examples. In JavaScript, there is no syntax for multiple inheritance, so we won't discuss it here.
+
+```js
+class Alive { }
+class Animal { }
+class Dog extends Alive, Animal { }
+RESULT:
+SyntaxError: on line 3: Unexpected token, expected "{"
+```
+
+Finally, a note on when inheritance is appropriate. Object-oriented programming was very popular in the 1990s, sometimes promoted with an almost religious fervor. That fervor has died down now. We recommend viewing classes, and especially inheritance, as just another tool. Like any tool, it's important not to reach for them when they're not needed. Here's an example from React JS, a popular JavaScript UI library.
+
+In older versions of React, components were defined using classes: class MyComponent extends React.Component. This made a lot of sense, because React.Component defines many properties and methods that our components will want to use. It sets this.props so a component can easily see the data sent to it from parent components. It defines this.setState so a component can change its state easily, and so on.
+
+That class syntax has since been superseded by a very clever mechanism called React hooks. With hooks, the classes disappear and we just write functions. Components written with hooks are noticeably shorter, and the consensus is that hooks also lead to components that are easier to read and reason about.
+
+React hooks' success isn't an argument that "classes are bad". But it does show us that, even in cases where classes model a problem well, there might be an even better model. Execute Program itself contains a number of classes: User, Graph (a graph data structure), Parser (a parser for our course definition markup language), etc. But most of the application logic is contained in regular functions, not in classes.
+
+## lesson 26
+
+## Lesson 27
+
+## Lesson 28
+
+## Lesson 29
+
+## Lesson 30
