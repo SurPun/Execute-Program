@@ -138,7 +138,105 @@ RESULT:
 true
 ```
 
-## Lesson 3
+## Lesson 3 Regular Expressions: Boundaries
+
+Often, we want to match text at the beginning and end of strings. We'll use boundaries for that. The first is ^, which means beginning of string.
+
+1.
+```js
+/^cat/.test('cat');
+RESULT:
+true
+
+/^cat/.test('cats are cute');
+RESULT:
+true
+
+/^cat/.test('I like cats');
+RESULT:
+false
+
+/^cat/.test('cats like dogs');
+RESULT:
+true
+
+/^cat/.test('dogs like cats');
+RESULT:
+false
+```
+
+The second boundary is $, which means end of string.
+
+2.
+```js
+/cat$/.test('a dog');
+RESULT:
+false
+
+/cat$/.test('a cat');
+RESULT:
+true
+
+/cat$/.test('cats');
+RESULT:
+false
+```
+
+Usually, we want to match an entire string. Most regexes should include these boundaries, ^ and $.
+
+3.
+```js
+/^a$/.test('a');
+RESULT:
+true
+
+/^a$/.test('the letter a');
+RESULT:
+false
+
+/^a$/.test('a cat');
+RESULT:
+false
+```
+
+To match only the empty string, we can smash the ^ and $ together.
+
+4.
+```js
+/^$/.test('a');
+RESULT:
+false
+
+/^$/.test(' ');
+RESULT:
+false
+
+/^$/.test('');
+RESULT:
+true
+```
+
+If we use the wrong boundaries, there's no error. The regex always returns false.
+
+5.
+```js
+/$cat^/.test('cat');
+RESULT:
+false
+```
+
+Also, if we use boundaries in the wrong place, the regex will always return false.
+
+6.
+```js
+/cat$s/.test('cats');
+RESULT:
+false
+
+/cat^s/.test('cat');
+RESULT:
+false
+```
 
 ## Lesson 4
 
