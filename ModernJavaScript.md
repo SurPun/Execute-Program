@@ -3900,7 +3900,169 @@ RESULT:
 [false, true]
 ```
 
-## Lesson 31
+## Lesson 31 Modern JavaScript: Set operations
+
+Sets in every programming language provide a range of useful operations that are missing in JavaScript. Normally, sets have at least the three most common operations: union, intersection, and difference. It's OK if those aren't familiar; in this lesson, we'll define them and see how to implement them in JavaScript.
+
+First: we sometimes want to find a set union, which is every element that's in either set1 or set2. The closest array equivalent is concat:
+
+1.
+```js
+const array1 = [1, 2, 3];
+const array2 = [2, 3, 4];
+array1.concat(array2);
+RESULT:
+[1, 2, 3, 2, 3, 4]
+```
+
+Set union is the same thing, but it respects the constraint that a set only contains unique values. If the concat operation above were a set union, we'd expect a result of [1, 2, 3, 4].
+
+Fortunately, implementing set union is easy with a couple tricks. First, we can pass an array to the new Set constructor to build a set with all of the elements from the array. Second, we can use the spread operator, ..., to build arrays that contain the elements from a set, or even from multiple sets: [...set1, ...set2].
+
+(The reality is that sets are JavaScript iterators, and the new Set constructor accepts iterators as arguments. But iterators are covered elsewhere in this course and aren't necessary to understand this lesson.)
+
+By combining those two tricks, we can build a true set union:
+
+2.
+```js
+const set1 = new Set([1, 2, 3]);
+const set2 = new Set([2, 3, 4]);
+const unionSet = new Set([...set1, ...set2]);
+[unionSet.has(1), unionSet.has(4)];
+RESULT:
+[true, true]
+
+Array.from(unionSet);
+RESULT:
+[1, 2, 3, 4]
+```
+
+Implement a general-purpose setUnion function that returns the union of two sets.
+
+3.
+```js
+function setUnion(set1, set2) {
+  return new Set([...set1, ...set2]);
+}
+const union = setUnion(
+  new Set([1, 2, 3]),
+  new Set([2, 3, 4])
+);
+[union.has(1), union.has(2), union.has(3), union.has(4)];
+GOAL:
+[true, true, true, true]
+YOURS:
+[true, true, true, true]
+```
+
+Second: we sometimes want to find a set intersection, which is every element that's in both set1 and set2. With arrays, we can use filter to do that. (filter takes a function f, calls it on every array element, and returns an array with all of the elements where f(element) was true.)
+
+In English, this example can be read as "build an array of all array1 elements where array2 also includes that element."
+
+4.
+```js
+const array1 = [1, 2, 3];
+const array2 = [2, 3, 4];
+array1.filter(n => array2.includes(n));
+RESULT:
+[2, 3]
+```
+
+For sets, we can use the same trick. We'll convert set1 into an array, then filter it, checking for whether each element exists in set2.
+
+5.
+```js
+const set1 = new Set([1, 2, 3]);
+const set2 = new Set([2, 3, 4]);
+const intersectionSet = new Set(
+  Array.from(set1).filter(n => set2.has(n))
+);
+[intersectionSet.has(2), intersectionSet.has(3)];
+RESULT:
+[true, true]
+
+Array.from(intersectionSet);
+RESULT:
+[2, 3]
+```
+
+Implement a general-purpose setIntersection function that returns the intersection of two sets.
+
+6.
+```js
+function setIntersection(set1, set2) {
+  return new Set(Array.from(set1).filter(n => set2.has(n)));
+}
+const intersection = setIntersection(
+  new Set([1, 2, 3]),
+  new Set([2, 3, 4])
+);
+[
+  intersection.has(1),
+  intersection.has(2),
+  intersection.has(3),
+  intersection.has(4)
+];
+GOAL:
+[false, true, true, false]
+YOURS:
+[false, true, true, false]
+```
+
+Sometimes we want to find every element in set1 that isn't also in set2. For example:
+
+- set1 = new Set([1, 2, 3])
+- set2 = new Set([2, 3, 4])
+- The element 1 is in set1 but not set2, so the set difference is [1].
+
+The code for set difference is exactly like intersection, but we put a ! inside the filter. Then the filter means "build an array of all set1 elements where set2 doesn't include the element."
+
+7.
+```js
+const set1 = new Set([1, 2, 3]);
+const set2 = new Set([2, 3, 4]);
+const differenceSet = new Set(
+  Array.from(set1).filter(n => !set2.has(n))
+);
+[differenceSet.has(1), differenceSet.has(2)];
+RESULT:
+[true, false]
+
+Array.from(differenceSet);
+RESULT:
+[1]
+```
+
+In the examples above, the element 4 is in the second set, but not in the first set. When speaking casually, we might say that 4 is part of the "difference" between the two sets. But in both math and programming, elements from the second set aren't included in the set difference.
+
+(There's also a related operation called "symmetric set difference". It means "every element that's in only one of the two sets." If we used symmetric set difference in the example above, we'd get [1, 4]. But we won't mention symmetric set difference again in this lesson.)
+
+Implement a general-purpose setDifference function that returns the difference of two sets. Remember that "set difference" means "all items that are in the first set, but aren't in the second set."
+
+8.
+```js
+function setDifference(set1, set2) {
+  return new Set(Array.from(set1).filter(n => !set2.has(n)));
+}
+const difference = setDifference(
+  new Set([1, 2, 3]),
+  new Set([2, 3, 4])
+);
+[
+  difference.has(1),
+  difference.has(2),
+  difference.has(3),
+  difference.has(4)
+];
+GOAL:
+[true, false, false, false]
+YOURS:
+[true, false, false, false]
+```
+
+Set union is different from array concatenation because it results in a set, which has no duplicates. Set intersection and difference both do the same things as the array versions. But they're better than our array versions because they're much faster. (Using the technical terminology: all of the set operations implemented here are O(n), but our array equivalents are O(n^2).)
+
+In both cases, it's good to know about these set operations, even if you don't memorize exactly how to write them!
 
 ## Lesson 32
 
