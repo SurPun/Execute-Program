@@ -67,3 +67,79 @@ false
 RESULT:
 true
 ```
+
+## Lesson 2 Regular Expressions: Wildcard
+
+Regexes like /a/ are literal: they specify exact characters to match. The real power in regexes is in the various operators. The most basic is ., the wildcard operator. It matches any character. But the character must be present; . won't match the empty string.
+
+1.
+```js
+/./.test('a');
+RESULT:
+true
+
+/./.test('b');
+RESULT:
+true
+
+/./.test('>');
+RESULT:
+true
+
+/./.test('');
+RESULT:
+false
+```
+
+There's one important special case for /./: it doesn't match newlines!
+
+2.
+```js
+/./.test('\n');
+RESULT:
+false
+```
+
+Putting . next to another character means that they occur consecutively. For example, /a./ matches an "a" followed by any character. And /.a/ matches any character followed by an "a".
+
+3.
+```js
+/x.z/.test('xyz');
+RESULT:
+true
+
+/x.z/.test('xaz');
+RESULT:
+true
+
+/x.z/.test('xyyz');
+RESULT:
+false
+
+/x.z/.test('x_z');
+RESULT:
+true
+```
+
+When there are multiple .s, they can match different characters.
+
+4.
+```js
+/x..z/.test('xaaz');
+RESULT:
+true
+
+/x..z/.test('xaz');
+RESULT:
+false
+
+/x..z/.test('xabz');
+RESULT:
+true
+```
+
+## Lesson 3
+
+## Lesson 4
+
+## Lesson 5
