@@ -3509,7 +3509,144 @@ RESULT:
 ReferenceError: Cat is not defined
 ```
 
-## Lesson 28
+## Lesson 28 Modern JavaScript: New number methods
+
+Number.isNaN isn't the only new property on Number. For example, Number.isFinite checks that a value is neither Infinity or -Infinity. Using isFinite helps you to avoid a possible mistake: checking for infinite values by doing x === Infinity. That would miss -Infinity, which is a different value!
+
+1.
+```js
+Infinity === -Infinity;
+RESULT:
+false
+
+Number.isFinite(5);
+RESULT:
+true
+
+Number.isFinite(Infinity);
+RESULT:
+false
+
+Number.isFinite(-Infinity);
+RESULT:
+false
+
+Number.isFinite('a string');
+RESULT:
+false
+```
+
+isFinite returns false for NaN. That makes some sense: NaN isn't a number, so it's definitely not a finite number!
+
+```js
+Number.isFinite(NaN);
+RESULT:
+false
+```
+
+All numbers in JavaScript are floating point, which means that they become imprecise past a certain threshold. This can be especially dangerous when dealing with numbers that we think of as integers.
+
+Modern versions of JavaScript give us Number.MIN_SAFE_INTEGER and Number.MAX_SAFE_INTEGER to help here. They define the smallest and largest numbers that can be safely treated as integers.
+
+```js
+Number.MAX_SAFE_INTEGER;
+RESULT:
+9007199254740991
+
+Number.MIN_SAFE_INTEGER;
+RESULT:
+-9007199254740991
+
+Number.MIN_SAFE_INTEGER === -Number.MAX_SAFE_INTEGER;
+RESULT:
+true
+```
+
+When a number is larger than MAX_SAFE_INTEGER or smaller than MIN_SAFE_INTEGER, floating point arithmetic becomes imprecise. For example, we can come up with a situation where x + 1 === x + 2 in JavaScript.
+
+2.
+```js
+Number.MAX_SAFE_INTEGER + 1 === Number.MAX_SAFE_INTEGER + 2;
+RESULT:
+true
+```
+
+Integer numbers between MIN_SAFE_INTEGER and MAX_SAFE_INTEGER behave normally.
+
+3.
+```js
+Number.MAX_SAFE_INTEGER - 1 === Number.MAX_SAFE_INTEGER;
+RESULT:
+false
+```
+
+There's also a Number.isSafeInteger method that checks both the lower and upper bounds for us.
+
+4.
+```js
+Number.isSafeInteger(Number.MAX_SAFE_INTEGER);
+RESULT:
+true
+
+Number.isSafeInteger(Number.MAX_SAFE_INTEGER + 1);
+RESULT:
+false
+
+Number.isSafeInteger(Number.MIN_SAFE_INTEGER);
+RESULT:
+true
+
+Number.isSafeInteger(Number.MIN_SAFE_INTEGER - 1);
+RESULT:
+false
+
+Number.isSafeInteger('a string');
+RESULT:
+false
+```
+
+Write a safeIntegerMultiply function that multiplies two numbers. If the product of the numbers isn't a safe integer, it should throw an error. (You can throw with throw new Error('Product is an unsafe integer').)
+
+A hint: you should check whether the product of the two numbers (x * y) is a safe integer or not. It's possible for the product to be unsafe even if the x and y are both safe on their own. For example, an x of 2 and a y of 4503599627370496 are both safe on their own, but their product of 9007199254740992 is not safe.
+
+5.
+```js
+function safeIntegerMultiply(x, y) {
+  const product = x * y;
+  if (!Number.isSafeInteger(product)) {
+    throw new Error('Product is an unsafe integer');
+  }
+  return product;
+}
+​
+const product = safeIntegerMultiply(3, 5);
+let [threwForLargeNumber, threwForSmallNumber] = [false, false];
+​
+try { safeIntegerMultiply(2, 4503599627370496); }
+catch { threwForLargeNumber = true; }
+​
+try { safeIntegerMultiply(2, -4503599627370496); }
+catch { threwForSmallNumber = true; }
+​
+[product, threwForLargeNumber, threwForSmallNumber];
+GOAL:
+[15, true, true]
+YOURS:
+[15, true, true]
+```
+
+One final math-related feature. In the past, we used Math.pow to compute exponents. Now JavaScript has an exponentiation operator, **. This is the same syntax used in Ruby, Python, and other languages.
+
+6.
+```js
+Math.pow(2, 3);
+RESULT:
+8
+
+2 ** 3;
+RESULT:
+8
+```
 
 ## Lesson 29
 
