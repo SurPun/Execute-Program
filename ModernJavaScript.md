@@ -1,5 +1,45 @@
 # Modern JavaScript
 
+## How to run JavaScript code
+
+When you're working through Execute Program, you may want a playground to try out the code we show you. We recommending using your browser's console, or using Node.js.
+
+Using a browser console
+
+You can run JavaScript code in your browser's console. How to do this depends on which browser you're using.
+
+Chrome
+
+In the Chrome menu (three dots at the top-right of the top bar), select More Tools -> Developer Tools.
+Then select "Console" from the top bar of the developer tools.
+Safari:
+
+In the menu bar, select Safari -> Preferences -> Advanced, then select "Show Develop menu in menu bar".
+Then, in the menu bar, select Develop -> Show JavaScript Console.
+Firefox:
+
+In the Firefox menu (three lines at the top-right of the top bar), select Tools -> Web Developer -> Web Console.
+Edge:
+
+In the Edge menu (three dots at the top-right of the top bar), select More Tools -> Developer Tools. Then select "Console" from the top bar of the developer tools.
+You may also find this CodeSandbox useful for running small JavaScript snippets.
+
+Using Node.js
+
+When you're writing longer programs in JavaScript, using the browser console quickly becomes difficult. For longer programs, we recommend using Node.js to run JavaScript code. You can install it from the Node.js website.
+
+Node.js is also available in your package manager of choice. On Mac OSX, if you're using the Homebrew package manager, you can install Node.js with brew install node.
+
+If you have a file called my-code.js containing JavaScript code, you can run that code from the command line by typing node my-code.js. You can also use Node as an interactive JavaScript console (a "REPL") by running node in your terminal.
+
+Strict mode
+
+All of the examples in Execute Program run in strict mode, which prevents some common mistakes that arise from JavaScript's confusing behavior. If Execute Program suggests that a statement should error, but you're not seeing an error in your console of choice, strict mode may be the cause.
+
+Many modern JavaScript tools enforce strict mode by automatically adding 'use strict' to the top of your modules. However, strict mode isn't enabled in browsers' consoles. To use strict mode in a browser console, you'd have to prepend every code statement with 'use strict'; <your code here>. That's frustrating, so we don't recommend doing it all the time.
+
+Fortunately, you can enable strict mode in Node by running node --use_strict my-code.js, or node --use_strict to get an interactive REPL with strict mode enabled.
+
 ## Lesson 1 Modern JavaScript: Strict mode
 
 This course covers JavaScript as it exists today. It assumes basic familiarity with JavaScript:
