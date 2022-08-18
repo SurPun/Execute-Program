@@ -3648,6 +3648,144 @@ RESULT:
 8
 ```
 
-## Lesson 29
+## Lesson 29 Modern JavaScript: Anonymous and inline classes 
+
+We've seen that functions have a name property.
+
+1.
+```js
+function f() { return 1; }
+f.name;
+RESULT:
+'f'
+```
+
+Classes also have a name property.
+
+2.
+```js
+class Cat { }
+Cat.name;
+RESULT:
+'Cat'
+```
+
+As we saw for functions, the class definition itself can also be assigned to a variable. Most object-oriented languages don't allow this, but JavaScript does.
+
+3.
+```js
+const Animal = class Cat {
+  speak() {
+    return 'nyan';
+  }
+};
+new Animal().speak();
+RESULT:
+'nyan'
+```
+
+We can even inline the class definition into the new expression, so it's never assigned to a variable at all:
+
+4.
+```js
+const cat = new (
+  class {
+    speak() {
+      return 'yaong';
+    }
+  }
+)();
+cat.speak();
+RESULT:
+'yaong'
+```
+
+When we try to inspect the name of an anonymous class, we'll get the empty string ('').
+
+5.
+```js
+(
+  class { }
+).name;
+RESULT:
+''
+```
+
+If we immediately assign the class to a variable, that variable's name will become the class' name. This is the same behavior that we saw for anonymous functions.
+
+6.
+```js
+const Cat = class { };
+Cat.name;
+RESULT:
+'Cat'
+```
+
+As with functions, the anonymous class' name will be '' if it's not assigned directly to a variable.
+
+7.
+```js
+const classes = [class { }];
+classes[0].name;
+RESULT:
+''
+```
+
+Define an anonymous, inline rectangle class whose constructor takes width and height arguments. It should have an area method that returns the rectangle's area (the width times the height). We've provided the code to instantiate your class anonymously by storing it inside an array, then newing it from inside that array.
+
+8.
+```js
+const classes = [
+  class {
+    constructor(width, height) {
+      this.width = width;
+      this.height = height;
+    }
+    
+    area() {
+      return this.width * this.height;
+    }
+  }
+];
+const Rectangle = classes[0];
+const rectangle = new Rectangle(3, 4);
+[rectangle.area(), classes[0].name];
+GOAL:
+[12, '']
+YOURS:
+[12, '']
+```
+
+Anonymous classes work as usual with inheritance, even when there's a total lack of names in the classes.
+
+9.
+```js
+const Animal = class { };
+const Cat = class extends Animal { };
+new Cat() instanceof Animal;
+RESULT:
+true
+
+const classes = [];
+classes.push(class { });
+classes.push(class extends classes[0] { });
+const ParentClass = classes[0];
+const ChildClass = classes[1];
+new ChildClass() instanceof ParentClass;
+RESULT:
+true
+```
+
+In this lesson, we've seen classes and functions behave similarly with regards to the name property. Here's why they're so similar:
+
+```js
+typeof (class Cat { });
+RESULT:
+'function'
+```
+
+Internally, JavaScript classes are just functions. The implications of that are complex and, to be honest about it, pretty confusing. But we just saw one implication: when we assign an anonymous class directly to a variable, that variable's name becomes the class' name. That's not because classes and functions follow the same rule; it's because classes ARE functions!
+
+Classes can be anonymous (have no name), and they can be inline (the class definition itself is used as an expression). Both of those are uncommon. You certainly won't use them in most of the modules that you write. But they are used in real systems, so you'll encounter them eventually!
 
 ## Lesson 30
