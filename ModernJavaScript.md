@@ -4064,7 +4064,86 @@ Set union is different from array concatenation because it results in a set, whi
 
 In both cases, it's good to know about these set operations, even if you don't memorize exactly how to write them!
 
-## Lesson 32
+## Lesson 32 Modern JavaScript: Property order
+
+In many languages, properties in objects don't have a guaranteed order. (Some languages call their object-like data structures "hashes" or "dictionaries", but for our purposes here these are all the same thing.)
+
+Consistent ordering is nice; it's one less thing to think about. Fortunately, modern versions of JavaScript guarantee object key ordering!
+
+An object's keys will be in the order that they were defined in the object.
+
+```js
+Object.keys({a: 1, b: 2});
+RESULT:
+['a', 'b']
+```
+
+1.
+```js
+Object.keys({b: 2, a: 1});
+RESULT:
+['b', 'a']
+```
+
+If we add more keys to the object after it exists, the ordering is preserved there too.
+
+2.
+```js
+const user = {name: 'Amir', age: 36};
+user.email = 'amir@example.com';
+Object.keys(user);
+RESULT:
+['name', 'age', 'email']
+```
+
+Object key order is even preserved when we deserialize JSON with JSON.parse.
+
+3.
+```js
+const user = JSON.parse(`
+  {"name": "Amir", "email": "amir@example.com", "age": 36}
+`);
+Object.keys(user);
+RESULT:
+['name', 'email', 'age']
+```
+
+JSON.stringify preserves that order as well, so round-tripping an object through JSON won't change its keys' order.
+
+4.
+```js
+const user = JSON.parse(
+  JSON.stringify(
+    {name: 'Amir', email: 'amir@example.com', age: 36}
+  )
+);
+Object.keys(user);
+RESULT:
+['name', 'email', 'age']
+```
+
+There's one exception to the property order rule. It comes from an unusual part of JavaScript objects: they can have numbers as keys, and we can mix number keys with strings keys in the same object.
+
+When an object has number keys, (1) they always come first in the key list, (2) they're always sorted numerically, and (3) they're always converted into strings (1 becomes '1'). The string keys come next, in the order that they were inserted into the object, as we've already seen in this lesson.
+
+```js
+Object.keys({2: 'two', 1: 'one'});
+RESULT:
+['1', '2']
+
+Object.keys({b: 'b', 1: 'one', a: 'a'});
+RESULT:
+['1', 'b', 'a']
+```
+
+5.
+```js
+Object.keys({2: 'two', b: 'b', 1: 'one', a: 'a'});
+RESULT:
+['1', '2', 'b', 'a']
+```
+
+This number-vs-string issue is an unfortunate complication. However, the good news is that objects with mixed number and string keys are uncommon, so this doesn't come up much. For normal objects with string keys, you can trust that they'll stay in insertion order.
 
 ## Lesson 33
 
