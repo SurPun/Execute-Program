@@ -4145,7 +4145,105 @@ RESULT:
 
 This number-vs-string issue is an unfortunate complication. However, the good news is that objects with mixed number and string keys are uncommon, so this doesn't come up much. For normal objects with string keys, you can trust that they'll stay in insertion order.
 
-## Lesson 33
+## Lesson 33 Modern JavaScript: Customizing JSON serialization
+
+JSON.stringify allows us to customize its output by passing a second argument, replacer. If we give it an array of strings, then only those keys will be included in the resulting object.
+
+```js
+JSON.parse(
+  JSON.stringify(
+    {age: 36, city: 'Paris', name: 'Amir'},
+    ['name', 'city']
+  )
+);
+RESULT:
+{city: 'Paris', name: 'Amir'}
+```
+
+The replacer can also be a callback function taking two arguments, key and value. During stringification, our replacer is called with the key and value for each object, array, string, etc. We can replace any value by simply returning the new value that should take its place.
+
+In the next code example, we see this in action by logging the replacer's arguments at each step. Pay extra attention to the first logged line, where the overall object is passed to us with a key of "". (Execute Program will automatically show the console output, so you don't need to open your browser's built-in development console.)
+
+```js
+JSON.stringify(
+  {age: 36, name: 'Amir', cat: {name: 'Ms. Fluff'}},
+  (key, value) => {
+    console.log(`Key: ${JSON.stringify(key)}, value: ${JSON.stringify(value)}`);
+    return value;
+  }
+);
+console output
+  19 ms  Key: "", value: {"age":36,"name":"Amir","cat":{"name":"Ms. Fluff"}}
+  23 ms  Key: "age", value: 36
+  23 ms  Key: "name", value: "Amir"
+  24 ms  Key: "cat", value: {"name":"Ms. Fluff"}
+  24 ms  Key: "name", value: "Ms. Fluff"
+```
+
+The first replacer call gets the entire object. The key is "" because we're not inside of an object yet. Then we see separate calls for the age, name, and cat keys. Finally, stringify descends into the cat object, so we get a final call for its name key. We didn't replace any data in this example, but we could've replaced the data in any of these steps, from the entire object down to a single deeply nested property.
+
+At each step, our replacer function can do three things:
+
+- Return the value argument unmodified, which won't change anything.
+- Return some other value, which will replace the original value in the stringified JSON.
+- Return undefined, which will remove the key from the stringified JSON.
+
+```js
+JSON.parse(
+  JSON.stringify(
+    {name: 'Amir', catName: 'Ms. Fluff'},
+    (key, value) => {
+      if (typeof value === 'string') {
+        return 'New ' + value;
+      } else {
+        return value;
+      }
+    }
+  )
+);
+RESULT:
+{catName: 'New Ms. Fluff', name: 'New Amir'}
+```
+
+1.
+```js
+JSON.parse(
+  JSON.stringify(
+    {catName: 'Ms. Fluff', city: 'Paris', name: 'Amir'},
+    (key, value) => {
+      if (key === 'catName') {
+        return undefined;
+      } else {
+        return value;
+      }
+    }
+  )
+);
+RESULT:
+{city: 'Paris', name: 'Amir'}
+```
+
+There are some more details of the replacer function, but we won't cover them here. If you need to write a JSON.stringify replacer, you should definitely have the documentation open anyway! The important thing to know is that it exists, and that the replacer function gets a chance to modify every part of the object as it's stringified. That's enough to know when this tool is appropriate.
+
+Finally, JSON.parse has a similar feature called reviver. Conceptually, it's the opposite of JSON.stringify's replacer argument. As the JSON is decoded, the reviver can replace any value with a new value.
+
+2.
+```js
+/* Note that the "reviver" function here replaces all property values in
+ * the object! */
+JSON.parse(
+  '{"name": "Amir", "age": 36}',
+  (key, value) => {
+    if (key === '') {
+      return value;
+    } else {
+      return 'nevermind';
+    }
+  }
+);
+RESULT:
+{age: 'nevermind', name: 'nevermind'}
+```
 
 ## Lesson 34
 
