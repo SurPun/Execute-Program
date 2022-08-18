@@ -344,4 +344,47 @@ RESULT:
 false
 ```
 
-## Lesson 5
+## Lesson 5 Regular Expressions: Or
+
+Sometimes we need to allow multiple alternatives. We can separate them with a pipe character, |, pronounced "or".
+
+1.
+```js
+/a|b/.test('a');
+RESULT:
+true
+
+/a|b/.test('b');
+RESULT:
+true
+
+/a|b/.test('c');
+RESULT:
+false
+
+/at|og/.test('cat');
+RESULT:
+true
+
+/at|og/.test('dog');
+RESULT:
+true
+
+/at|og/.test('bat');
+RESULT:
+true
+
+/at|og/.test('horse');
+RESULT:
+false
+```
+
+## Lesson 6
+
+## Lesson 7
+
+## Lesson 8
+
+## Lesson 9
+
+## Lesson 10
