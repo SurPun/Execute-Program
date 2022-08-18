@@ -3788,4 +3788,124 @@ Internally, JavaScript classes are just functions. The implications of that are 
 
 Classes can be anonymous (have no name), and they can be inline (the class definition itself is used as an expression). Both of those are uncommon. You certainly won't use them in most of the modules that you write. But they are used in real systems, so you'll encounter them eventually!
 
-## Lesson 30
+## Lesson 30 Modern JavaScript: Accessor properties on classes
+
+We've seen accessors (getters and setters) in object literals:
+
+1.
+```js
+const user = {
+  get name() { return 'Be' + 'tty'; }
+};
+user.name;
+RESULT:
+'Betty'
+```
+
+We can also use accessors in classes. As with object literals, a getter's function will be called when we access the property.
+
+2.
+```js
+class User {
+  constructor(name) {
+    this.actualName = name;
+  }
+  
+  get name() {
+    return `${this.actualName} the user`;
+  }
+}
+new User('Betty').name;
+RESULT:
+'Betty the user'
+```
+
+Setters work in classes too.
+
+3.
+```js
+class User {
+  constructor(name) {
+    this.actualName = name;
+  }
+  
+  set name(newName) {
+    this.actualName = newName;
+  }
+}
+const user = new User('Amir');
+user.name = 'Betty';
+user.actualName;
+RESULT:
+'Betty'
+```
+
+Write a User class that:
+
+- Takes an initial name as a constructor argument.
+- Stores that in a names array property, representing a history of the user's names.
+- Has a name setter that adds a new name to the array using this.names.push(...).
+
+4.
+```js
+class User {
+  constructor(name) {
+    this.names = [name];
+  }
+  
+  set name(newName) {
+    this.names.push(newName);
+  }
+}
+​
+const user = new User('Amir');
+const names1 = user.names.slice();
+user.name = 'Betty';
+const names2 = user.names.slice();
+({names1, names2});
+GOAL:
+{names1: ['Amir'], names2: ['Amir', 'Betty']}
+YOURS:
+{names1: ['Amir'], names2: ['Amir', 'Betty']}
+```
+
+When we extend a class, the child inherits any getters and setters from the parent.
+
+5.
+```js
+class Animal {
+  constructor(legCount) {
+    this.legCount = legCount;
+  }
+
+  get canWalk() {
+    return this.legCount > 0;
+  }
+}
+
+class Worm extends Animal {
+  constructor() {
+    super(0);
+  }
+}
+
+class Dog extends Animal {
+  constructor() {
+    super(4);
+  }
+}
+
+[new Worm().canWalk, new Dog().canWalk];
+RESULT:
+[false, true]
+```
+
+## Lesson 31
+
+## Lesson 32
+
+## Lesson 33
+
+## Lesson 34
+
+## Lesson 35
