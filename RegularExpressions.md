@@ -379,7 +379,116 @@ RESULT:
 false
 ```
 
-## Lesson 6
+## Lesson 6 Regular Expressions: Hex codes
+
+Computers internally store text as numbers. As a shorthand, we usually write those numbers out as hexadecimal codes.
+
+
+1.
+```js
+/\x41/.test('A'); // 'A' is x41
+RESULT:
+true
+```
+
+For example, capital letter "A" has the hex code x41. Regular expressions and most programming languages allow this "x" syntax. To match "A" in a regex, we can write \x41.
+
+2.
+```js
+/\x41/.test('an apple');
+RESULT:
+false
+
+/\x41/.test('CATS ARE GOOD');
+RESULT:
+true
+```
+
+x42 is "B".
+
+3.
+```js
+/\x42/.test('An apple');
+RESULT:
+false
+
+/\x42/.test('Both apples');
+RESULT:
+true
+```
+
+Each digit can be a number, or a letter between "a" and "f". For example, "M" is x4d in hex. (The x isn't a hex digit; it's telling us that this is a hex code.)
+
+4.
+```js
+/\x4d/.test('M');
+RESULT:
+true
+```
+
+There's a hex code for each character, even ones that aren't letters. "?" is x3f and "!" is x21.
+
+5.
+```js
+/\x3f/.test('?');
+RESULT:
+true
+
+/\x21/.test('!');
+RESULT:
+true
+```
+
+We can use hex codes to match symbols that you may not be able to type.
+
+The letter "ø" doesn't appear on an US-English keyboard. To match that letter, we can use its hex code \xf8.
+
+6.
+```js
+/\xf8/.test('søt katt');
+RESULT:
+true
+```
+
+If we have a keyboard that can type "ø", we can put it directly in a regex.
+
+7.
+```js
+/ø/.test('smørbrød');
+RESULT:
+true
+```
+
+Be careful: the syntax \x can only be followed by exactly two digits. Anything after the two digits will be a different part of the regex.
+
+8.
+```js
+/\x41d/.test('A');
+RESULT:
+false
+
+/\x5Ad/.test('Zd'); // "Z" is x5A
+RESULT:
+true
+```
+
+If we write an \x with only one digit, it's no longer a character code. Instead, the \x matches literal "x" characters.
+
+9.
+```js
+/\x4/.test('x4'); // This is probably a mistake with \x!
+RESULT:
+true
+```
+
+Hexadecimal digits can be any character from 0-9, a-f, or A-F. If we use the wrong characters, the \x will match literal "x" again.
+
+10.
+```js
+/\xfg/.test('xfg');
+RESULT:
+true
+```
 
 ## Lesson 7
 
