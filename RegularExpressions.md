@@ -710,6 +710,84 @@ RESULT:
 false
 ```
 
-## Lesson 9
+## Lesson 9 Regular Expressions: Escaping
+
+In most programming languages, strings are delimited with "double quotes". To put a literal double quote in a string, we escape it. The string "\"" contains exactly one double quote. (It's the same as '"'.)
+
+In regexes, + normally repeats whatever comes before it. But we can escape the + as \+ to match a literal "+". Likewise for other operators like ..
+
+1.
+```js
+/\./.test('That is a cat.');
+RESULT:
+true
+
+/\./.test('Is that a cat?');
+RESULT:
+false
+
+/.\+./.test('111');
+RESULT:
+false
+
+/.\+./.test('1+1');
+RESULT:
+true
+
+/\++/.test('+');
+RESULT:
+true
+
+/\++/.test('++');
+RESULT:
+true
+
+/\+\+/.test('++');
+RESULT:
+true
+
+/\+\+/.test('+');
+RESULT:
+false
+```
+
+Escaping can be used when you need a literal ^, $, etc. (It works for any operator.)
+
+2.
+```js
+/\^/.test('^');
+RESULT:
+true
+
+/\$/.test('$');
+RESULT:
+true
+
+/\$$/.test('$a');
+RESULT:
+false
+
+/\$$/.test('a$');
+RESULT:
+true
+
+/a|b/.test('|');
+RESULT:
+false
+
+/a\|b/.test('a|b');
+RESULT:
+true
+```
 
 ## Lesson 10
+
+## Lesson 11
+
+## Lesson 12
+
+## Lesson 13
+
+## Lesson 14
+
+## Lesson 15
