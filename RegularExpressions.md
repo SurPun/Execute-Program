@@ -780,7 +780,86 @@ RESULT:
 true
 ```
 
-## Lesson 10
+## Lesson 10 Regular Expressions: Basic character classes
+
+Some sets of characters occur together frequently. For example, we often need to recognize numbers (the digits 0-9). We can use \d for that. It recognizes 0, 1, ..., 8, 9.
+
+1.
+```js
+/\s/.test(' ');
+RESULT:
+true
+
+/\s/.test('\n');
+RESULT:
+true
+
+/\s/.test('');
+RESULT:
+false
+
+/\s/.test('x\ty'); /* \t is a tab character */
+RESULT:
+true
+
+/\s/.test('cat');
+RESULT:
+false
+
+/\d/.test('0');
+RESULT:
+true
+
+/\d/.test('9');
+RESULT:
+true
+
+/\d/.test('a');
+RESULT:
+false
+```
+
+Making these character classes upper-case negates them. For example, \d is all digits. But \D is any character that isn't a digit.
+
+2.
+```js
+/\D/.test('0');
+RESULT:
+false
+
+/\S/.test(' ');
+RESULT:
+false
+
+/\S/.test('0');
+RESULT:
+true
+```
+
+A character class matches only one character in the string. If we want to match multiple characters, we can use + or *.
+
+3.
+```js
+/^\d$/.test('1000');
+RESULT:
+false
+
+/^\d*$/.test('3000');
+RESULT:
+true
+
+/^\d*$/.test('1000 cats');
+RESULT:
+false
+
+/^\d*$/.test('cats');
+RESULT:
+false
+
+/^\d*$/.test('');
+RESULT:
+true
+```
 
 ## Lesson 11
 
