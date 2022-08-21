@@ -635,7 +635,80 @@ RESULT:
 false
 ```
 
-## Lesson 8
+## Lesson Regular Expressions: Maybe
+
+The ? operator matches a character zero or one times, but not more than one.
+
+1.
+```js
+/^a?$/.test('a');
+RESULT:
+true
+
+/^a?$/.test('');
+RESULT:
+true
+
+/^a?$/.test('b');
+RESULT:
+false
+
+/^a?$/.test('aa');
+RESULT:
+false
+```
+
+The ? operator affects whatever is immediately before it. For example, in ab?, the ? operators only affects "b", not "a". We say that it binds tightly.
+
+2.
+```js
+/^ab?$/.test('a');
+RESULT:
+true
+
+/^ab?$/.test('b');
+RESULT:
+false
+
+/^ab?$/.test('ab');
+RESULT:
+true
+```
+
+Often, part of a string is optional. For example, US telephone numbers sometimes have area codes. But for local calls, no area code is necessary. For optional strings like this, we can use the ? operator.
+
+3.
+```js
+/^555-?555-5555$/.test('555-555-5555');
+RESULT:
+true
+```
+
+Unfortunately, this regex is too permissive. The ? only applies to the "-" character before it, so only that character is optional. All of the other characters are required.
+
+4.
+```js
+/^555-?555-5555$/.test('555555-5555');
+RESULT:
+true
+```
+
+To make ? include more characters, we can group them using parentheses. Then we apply the ? to the whole group.
+
+5.
+```js
+/^(555-)?555-5555$/.test('555-555-5555');
+RESULT:
+true
+
+/^(555-)?555-5555$/.test('555-5555');
+RESULT:
+true
+
+/^(555-)?555-5555$/.test('555555-5555');
+RESULT:
+false
+```
 
 ## Lesson 9
 
