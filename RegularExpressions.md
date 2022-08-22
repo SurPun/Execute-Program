@@ -861,7 +861,136 @@ RESULT:
 true
 ```
 
-## Lesson 11
+## Lesson 11 Regular Expressions: Basic character sets
+
+With "or" expressions, we can recognize a whole set of characters.
+
+1.
+```js
+/^c(a|o|u)t$/.test('cat');
+RESULT:
+true
+```
+
+This gets tiresome if we need many options in the "or". Fortunately, we can use a character set to simplify it. The set [aou] is equivalent to (a|o|u).
+
+2.
+```js
+/^c[aou]t$/.test('cat');
+RESULT:
+true
+
+/^c[aou]t$/.test('cot');
+RESULT:
+true
+
+/^c[aou]t$/.test('cet');
+RESULT:
+false
+```
+
+What if we want to allow any string of lower case letters? We'd have to write /(a|b|c|d|e| and so on. Instead, we can write another character set.
+
+3.
+```js
+/[abcdefghijklmnopqrstuvwxyz]/.test('a');
+RESULT:
+true
+
+/[abcdefghijklmnopqrstuvwxyz]/.test('g');
+RESULT:
+true
+```
+
+That was shorter, but still wordy. We can specify an entire range of characters by using -.
+
+4.
+```js
+/[a-z]/.test('g');
+RESULT:
+true
+
+/[1-3]/.test('1');
+RESULT:
+true
+
+/[1-3]/.test('a');
+RESULT:
+false
+
+/[1-3]/.test('2');
+RESULT:
+true
+```
+
+As usual, we escape special characters when we want them to be literal. This range contains only one character, an escaped ] written as \].
+
+5.
+```js
+/[\]]/.test(']');
+RESULT:
+true
+```
+
+Character sets can be negated to mean "everything not in the set".
+
+6.
+```js
+/[^a]/.test('a');
+RESULT:
+false
+
+/[^a]/.test('5');
+RESULT:
+true
+```
+
+Negation applies to the entire character set. The regex /[^ab]/ means "any character other than a or b".
+
+7.
+```js
+/[^ab]/.test('a');
+RESULT:
+false
+
+/[^ab]/.test('c');
+RESULT:
+true
+
+/[^ab]/.test('_');
+RESULT:
+true
+```
+
+Negation also applies to ranges.
+
+8.
+```js
+/[a-z]/.test('h');
+RESULT:
+true
+
+/[^a-z]/.test('h');
+RESULT:
+false
+
+/[^a-z]/.test('5');
+RESULT:
+true
+```
+
+Character sets match exactly one character in the string. (This is like character classes, which also match only one character.) To match more than one character, we can use + or *.
+
+9.
+```js
+/^[a-z]$/.test('cat');
+RESULT:
+false
+
+/^[a-z]+$/.test('cat');
+RESULT:
+true
+```
 
 ## Lesson 12
 

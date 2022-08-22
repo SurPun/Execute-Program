@@ -2432,7 +2432,6 @@ class Rectangle {
     this.height = height;
   }
 ​
-return this.width * this.height;
   area() {
     return this.width * this.height;
   }
