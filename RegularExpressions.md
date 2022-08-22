@@ -992,7 +992,84 @@ RESULT:
 true
 ```
 
-## Lesson 12
+## Lesson 12 Regular Expressions: Character classes
+
+Regexes have many special cases to solve common problems. For example, we often write regexes to process source code. Most code contains identifiers: variable names, function names, etc. In most languages, identifiers can have letters, numbers, and underscores.
+
+We could write [A-Za-z0-9_] to mean "letters, numbers, and underscores." But that's verbose, and regexes are meant to be terse. Instead, we can use the character class \w. The "w" in \w stands for "word", which is another name for an identifier. This can be tricky: "word" has a special meaning in programming!
+
+1.
+```js
+/\w/.test('a');
+RESULT:
+true
+
+/\w/.test('+');
+RESULT:
+false
+
+/\w/.test('F');
+RESULT:
+true
+
+/\w/.test('_');
+RESULT:
+true
+
+/a\wc/.test('abc');
+RESULT:
+true
+
+/a\wc/.test('a-c');
+RESULT:
+false
+
+/^\w$/.test('aaa');
+RESULT:
+false
+```
+
+We can match entire identifiers by combining \w with + and boundaries.
+
+2.
+```js
+/^\w+$/.test('my_variable');
+RESULT:
+true
+
+/^\w+$/.test('1+1');
+RESULT:
+false
+
+/^\w+$/.test('while');
+RESULT:
+true
+
+/^\w+$/.test('while (true)');
+RESULT:
+false
+```
+
+As with any character class, upper-casing the class negates it. (\W is the opposite of \w.)
+
+3.
+```js
+/\w/.test('c');
+RESULT:
+true
+
+/\W/.test('c');
+RESULT:
+false
+
+/\w/.test('!');
+RESULT:
+false
+
+/\W/.test('!');
+RESULT:
+true
+```
 
 ## Lesson 13
 
