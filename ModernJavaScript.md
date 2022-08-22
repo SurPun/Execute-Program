@@ -4284,6 +4284,183 @@ RESULT:
 {age: 'nevermind', name: 'nevermind'}
 ```
 
-## Lesson 34
+## Lesson 34 Modern JavaScript: Default parameters
+
+If we call a JavaScript function with an argument missing, the corresponding parameter will get the value undefined.
+
+1.
+```js
+function wrapInArray(value) {
+  return [value];
+}
+wrapInArray();
+RESULT:
+[undefined]
+```
+
+This is unfortunate because it might be a mistake, but no error happens. Few other programming languages allow this for exactly that reason. (However, this is fixed in TypeScript, which we have a course on!)
+
+In the past, this behavior was used to provide default values for missing arguments.
+
+2.
+```js
+function add(x, y) {
+  if (y === undefined) {
+    y = 0;
+  }
+  return x + y;
+}
+[add(1, 2), add(1)];
+RESULT:
+[3, 1]
+```
+
+That works, but it's clunky. Modern JavaScript has native support for default function arguments, so we don't need to do that trick any more. Defaults are declared using an = inside the function parameter list.
+
+3.
+```js
+function add(x, y=0) {
+  return x + y;
+}
+[add(1, 2), add(1)];
+RESULT:
+[3, 1]
+```
+
+Defaults are evaluated when the function is called, not when it's defined. They can even reference other arguments.
+
+4.
+```js
+let defaultAddend = 1;
+function add(x, y=defaultAddend) {
+  return x + y;
+}
+const sum1 = add(1);
+
+defaultAddend = 2;
+const sum2 = add(1);
+
+[sum1, sum2];
+RESULT:
+[2, 3]
+
+function add(x, y=x) {
+  return x + y;
+}
+[add(1, 2), add(1), add(2)];
+RESULT:
+[3, 2, 4]
+```
+
+Some other programming languages handle defaults differently. Python is a notable example: in Python, the default value is evaluated only once, when the function is defined. The above example would be illegal in Python because the value of x can't be known when the function is defined. If you know Python, be very careful because this difference can lead you to introduce subtle bugs!
+
+Default parameters also work in methods on classes.
+
+5.
+```js
+class User {
+  constructor(name, isAdmin=false) {
+    this.name = name;
+    this.isAdmin = isAdmin;
+  }
+}
+[new User('Amir').isAdmin, new User('Betty', true).isAdmin];
+RESULT:
+[false, true]
+```
+
+Any value can be used as a default. For example, we can use an object as a default value.
+
+6.
+```js
+function addObjects(xObj, yObj={y: 0}) {
+  return xObj.x + yObj.y;
+}
+[
+  addObjects({x: 1}, {y: 2}),
+  addObjects({x: 1})
+];
+RESULT:
+[3, 1]
+```
+
+When we say "any value", we mean it! For example, we can even use an inline anonymous class as the default value.
+
+```js
+function instantiate(TheClass) {
+  return new TheClass();
+}
+class Dog { }
+instantiate(Dog) instanceof Dog;
+RESULT:
+true
+```
+
+7.
+```js
+function instantiate(TheClass=class { }) {
+  return new TheClass();
+}
+class Dog { }
+instantiate(Dog) instanceof Dog;
+RESULT:
+true
+
+instantiate() instanceof Dog;
+RESULT:
+false
+```
+
+We can use destructuring together with defaults. The default can even refer to a value that we get by destructuring another argument.
+
+8.
+```js
+function addObjects({x}, yObj={y: x}) {
+  return x + yObj.y;
+}
+addObjects({x: 1}, {y: 2});
+RESULT:
+3
+
+addObjects({x: 1});
+RESULT:
+2
+```
+
+The JavaScript virtual machine will allow us to use defaults together with rest parameters. That combination is rarely useful, but it is possible.
+
+```js
+function addToLength(x=3, ...elements) {
+  return x + elements.length;
+}
+addToLength(5, 'a', 'b');
+RESULT:
+7
+```
+
+9.
+```js
+addToLength(5, 'a');
+RESULT:
+6
+
+addToLength(5);
+RESULT:
+5
+
+addToLength();
+RESULT:
+3
+```
 
 ## Lesson 35
+
+## Lesson 36
+
+## Lesson 37
+
+## Lesson 38
+
+## Lesson 39
+
+## Lesson 40
