@@ -1285,4 +1285,104 @@ RESULT:
 false
 ```
 
-## Lesson 15
+## Lesson 15 Regular Expressions: Word boundaries
+
+When using a regular expression to search for a word, we usually don't want to match those letters inside another word.
+
+1.
+```js
+/cat/.test("I couldn't locate Mr. Meow.");
+RESULT:
+true
+```
+
+The word 'locate' contains 'cat', so this sentence matches.
+
+That's not what we want! We'd like to match the word 'cat'. Regexes provide a way to do this using the word boundary \b:
+
+2.
+```js
+/\bcat\b/.test('It was difficult to locate, but');
+RESULT:
+false
+
+/\bcat\b/.test('the cat returned.');
+RESULT:
+true
+```
+
+\b only matches where a word character is next to a non-word character. (Remember that word-characters are letters, numbers and underscores.)
+
+3.
+```js
+/\bcat\b/.test('cat-like reflexes');
+RESULT:
+true
+
+/\bcat\b/.test("var cat_name = 'Mr. Meow';");
+RESULT:
+false
+
+/\bcat\b/.test("Where's the cat's toy?");
+RESULT:
+true
+```
+
+Like most character classes, \b can be negated by capitalizing it. \B only matches between two word characters. It's pronounced "non-word-boundary".
+
+4.
+```js
+/\Bcat\B/.test('The cat over there');
+RESULT:
+false
+
+/\Bcat\B/.test('concatenate');
+RESULT:
+true
+```
+
+\B can be used to find out if a word has 'cat' in particular places, which could help win scrabble games.
+
+If you'd like to find words that contain "cat", but don't end with "cat":
+
+5.
+```js
+/cat\B/.test('publication');
+RESULT:
+true
+
+/cat\B/.test('wildcat');
+RESULT:
+false
+
+/cat\B/.test('catenary');
+RESULT:
+true
+```
+
+Or words that contain "cat" only in the middle:
+
+6.
+```js
+/\Bcat\B/.test('cathode');
+RESULT:
+false
+
+/\Bcat\B/.test('muscat');
+RESULT:
+false
+
+/\Bcat\B/.test('hecatomb');
+RESULT:
+true
+```
+
+## Lesson 16
+
+## Lesson 17
+
+## Lesson 18
+
+## Lesson 19
+
+## Lesson 20
