@@ -1163,6 +1163,126 @@ RESULT:
 false
 ```
 
-## Lesson 14
+## Lesson 14 Regular Expressions: Constrained repetition
+
+Sometimes we need text to be of a certain length. We could repeat . to enforce length.
+
+1.
+```js
+/^.....$/.test('1234');
+RESULT:
+false
+
+/^.....$/.test('12345');
+RESULT:
+true
+
+/^.....$/.test('123456');
+RESULT:
+false
+```
+
+This is awkward, especially if we want to match exactly, say, 20 characters. Fortunately, there's a better way: {curly braces}.
+
+2.
+```js
+/^.{5}$/.test('1234');
+RESULT:
+false
+
+/^.{5}$/.test('12345');
+RESULT:
+true
+
+/^.{5}$/.test('123456');
+RESULT:
+false
+```
+
+We can repeat anything in this way, not just .
+
+3.
+```js
+/^(a|b){3}$/.test('aaa');
+RESULT:
+true
+
+/^(a|b){3}$/.test('bba');
+RESULT:
+true
+
+/^(a|b){3}$/.test('ab');
+RESULT:
+false
+```
+
+By adding a comma, we can specify a range of allowed lengths.
+
+4.
+```js
+/^.{2,3}$/.test('1');
+RESULT:
+false
+
+/^.{2,3}$/.test('12');
+RESULT:
+true
+
+/^.{2,3}$/.test('123');
+RESULT:
+true
+
+/^.{2,3}$/.test('1234');
+RESULT:
+false
+```
+
+We can also specify "n or more characters" by omitting the second number. For example, .{8,} means "at least eight characters".
+
+5.
+```js
+/^[fho]{3,}$/.test('of');
+RESULT:
+false
+
+/^[fho]{3,}$/.test('off');
+RESULT:
+true
+
+/^[fho]{3,}$/.test('hoof');
+RESULT:
+true
+```
+
+In some regex systems, .{,5} means "at most five characters". Unfortunately, that's not true in JavaScript's regexes. JavaScript won't tell us about our mistake either. Instead, the {,5} gets interpreted as a literal string!
+
+6.
+```js
+/^.{,5}$/.test('12345');
+RESULT:
+false
+
+// Watch out: JavaScript regexes are weird in this case!
+/^.{,5}$/.test('.{,5}');
+RESULT:
+true
+```
+
+This is bizarre, but not a big problem. If we need five or fewer characters, we can say .{0,5}.
+
+7.
+```js
+/^.{0,5}$/.test('1234');
+RESULT:
+true
+
+/^.{0,5}$/.test('12345');
+RESULT:
+true
+
+/^.{0,5}$/.test('123456');
+RESULT:
+false
+```
 
 ## Lesson 15
