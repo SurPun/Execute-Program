@@ -1377,7 +1377,24 @@ RESULT:
 true
 ```
 
-## Lesson 16
+## Lesson 16 Regular Expressions: Character classes in sets
+
+Suppose that we're writing a regex to process Lisp code. Unlike most languages, Lisp allows the "-" character in identifiers. We can use a character set including everything in \w as well as -.
+
+1.
+```js
+/^[\w-]+$/.test('a_function');
+RESULT:
+true
+
+/^[\w-]+$/.test('a-function');
+RESULT:
+true
+
+/^[\w-]+$/.test('(describe-number)');
+RESULT:
+false
+```
 
 ## Lesson 17
 
