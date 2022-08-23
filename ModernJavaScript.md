@@ -4453,7 +4453,174 @@ RESULT:
 3
 ```
 
-## Lesson 35
+## Lesson 35 Modern JavaScript: Static methods
+
+So far, we've only seen methods on instances. But it's also possible to define methods on classes themselves, which are called "static methods".
+
+```js
+class User {
+  constructor(name) {
+    this.name = name;
+  }
+
+  static defaultNames() {
+    return ['Amir', 'Betty', 'Cindy'];
+  }
+}
+RESULT:
+undefined
+```
+
+1.
+```js
+User.defaultNames()[2];
+RESULT:
+'Cindy'
+```
+
+The difference here is that the method exists on the User variable itself, rather than on an object created with const user = new User():
+
+```js
+User.defaultNames();
+RESULT:
+['Amir', 'Betty', 'Cindy']
+
+const user = new User();
+user.defaultNames();
+RESULT:
+TypeError: user.defaultNames is not a function
+```
+
+Sometimes, we'll want multiple ways to create instances of a class. For example, we might want to have a separate function for creating administrator users (as opposed to regular, non-admin users). A JavaScript class can only have one constructor, so we can't do it that way. But we can use static methods as a substitute.
+
+2.
+```js
+class User {
+  constructor(name, isAdmin=false) {
+    this.name = name;
+    this.isAdmin = isAdmin;
+  }
+
+  static newAdmin(name) {
+    return new User(name, true);
+  }
+}
+
+[new User('Amir').isAdmin, User.newAdmin('Betty').isAdmin];
+RESULT:
+[false, true]
+```
+
+Use a static method to simulate an alternate constructor in this rectangle class. The static method's name should be square. It takes one argument, size. It returns a rectangle whose width and height are both equal to that size.
+
+3.
+```js
+class Rectangle {
+  constructor(width, height) {
+    this.width = width;
+    this.height = height;
+  }
+​
+  static square(size) {
+    return new Rectangle(size, size);
+  }
+}
+​
+const square = Rectangle.square(5);
+[square.width, square.height];
+GOAL:
+[5, 5]
+YOURS:
+[5, 5]
+```
+
+Accessors (getters and setters) can also be static. That means that the getter or setter is accessible on the class itself, not on instances.
+
+4.
+```js
+class User {
+  static get defaultName() {
+    return 'Amir';
+  }
+
+  constructor(name=User.defaultName) {
+    this.name = name;
+  }
+}
+
+[new User('Betty').name, new User().name];
+RESULT:
+['Betty', 'Amir']
+```
+
+If we try to access a static accessor on an instance, it won't be there. But we won't get an error; we'll just get undefined. That's because accessing an object property that doesn't exist always gives us undefined, regardless of the object.
+
+5.
+```js
+const obj = {};
+obj.defaultName;
+RESULT:
+undefined
+
+class User {
+  static get defaultName() {
+    return 'Amir';
+  }
+
+  constructor(name=User.defaultName) {
+    this.name = name;
+  }
+}
+
+new User('Betty').defaultName;
+RESULT:
+undefined
+```
+
+Inside of a static method or accessor, this refers to the class itself.
+
+6.
+```js
+class User {
+  static get myself() {
+    return this;
+  }
+}
+User.myself === User;
+RESULT:
+true
+```
+
+The name "static" doesn't mean that these methods and properties always return the same value. They can return any value that we like, even if it changes over time. For example, we can define a static setter and getter pair.
+
+7.
+```js
+class User {
+  static get defaultName() {
+    return this.realDefaultName;
+  }
+
+  static set defaultName(newDefaultName) {
+    /* We're inside of a static setter, so this line sets a property on
+     * the class itself, not on an instance. */
+    this.realDefaultName = newDefaultName;
+  }
+
+  constructor(name=User.realDefaultName) {
+    this.name = name;
+  }
+}
+
+User.defaultName = 'Amir';
+const amir = new User();
+
+User.defaultName = 'Betty';
+const betty = new User();
+
+[amir.name, betty.name];
+RESULT:
+['Amir', 'Betty']
+```
 
 ## Lesson 36
 
