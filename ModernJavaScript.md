@@ -4778,7 +4778,181 @@ Computed method names are confusing because they break one of our assumptions: "
 
 However, you'll encounter computed methods and accessors eventually, especially in library or framework code that needs to be very generic. When you do encounter them, the rule is relatively simple: when the class is being constructed, the virtual machine evaluates the string to get the method or accessor name. After the class is defined, those names won't change.
 
-## Lesson 37
+## Lesson 37 Modern JavaScript: Symbol basics
+
+Normally, object keys are strings. When an object has the key 'name', we can access it with obj.name or with obj['name'].
+
+1.
+```js
+const obj = {name: 'Amir'};
+obj['name'];
+RESULT:
+'Amir'
+```
+
+Most JavaScript data types can't be used as object keys. For example, if we try to use true as a key, it gets converted into the string 'true'.
+
+```js
+const obj = {};
+obj[true] = 1;
+Object.keys(obj);
+RESULT:
+['true']
+```
+
+If an object already has the key 'true', and we try to add true as a key, we'll only end up overwriting the value that already exists at true. The object will still have only one key at the end: 'true'.
+
+2.
+```js
+const obj = {
+  'true': 1
+};
+obj[true] = 2;
+obj;
+RESULT:
+{true: 2}
+```
+
+Modern versions of JavaScript have alleviated this limitation somewhat by adding symbols. Symbols are a new data type that can be used in object keys. We'll begin by exploring the basics of how symbols work, then move on to using them as keys.
+
+We can define a symbol by giving it a description: Symbol('name') or Symbol('dataIsSynced'). The description should say what the symbol is used for.
+
+3.
+```js
+Symbol('name').description;
+RESULT:
+'name'
+```
+
+Symbol equality works like array equality. A given array is always equal to itself. Likewise, a given symbol is always equal to itself.
+
+4.
+```js
+const myArray = ['cat'];
+myArray == myArray;
+RESULT:
+true
+
+const myArray = ['dog'];
+myArray === myArray;
+RESULT:
+true
+
+const a = Symbol('horse');
+a == a;
+RESULT:
+true
+
+const a = Symbol('pig');
+a === a;
+RESULT:
+true
+```
+
+Two arrays are never equal to each other, even if they contain the same elements. Likewise, two symbols are never equal to each other, even if they have the same description.
+
+5.
+```js
+['cat'] == ['cat'];
+RESULT:
+false
+
+['dog'] === ['dog'];
+RESULT:
+false
+
+Symbol('cat') == Symbol('dog');
+RESULT:
+false
+
+Symbol('horse') === Symbol('cow');
+RESULT:
+false
+
+Symbol('cat') == Symbol('cat');
+RESULT:
+false
+
+Symbol('dog') === Symbol('dog');
+RESULT:
+false
+
+const symbol1 = Symbol('cat');
+const symbol2 = Symbol('cat');
+[symbol1 === symbol1, symbol1 === symbol2, symbol2 === symbol2];
+RESULT:
+[true, false, true]
+```
+
+Now that we've seen the basics of symbols, we can start using them as object keys. But how exactly do we get a symbol key into an object? If we store it in a nameSymbol variable, and then say {nameSymbol: 1}, then the unquoted nameSymbol key is just a string. The key will be 'nameSymbol' and the nameSymbol variable won't be referenced at all.
+
+```js
+const nameSymbol = Symbol('name');
+const obj = {
+  nameSymbol: 1
+};
+Object.keys(obj);
+RESULT:
+['nameSymbol']
+```
+
+To use the symbol itself as a key, we can use computed property syntax: {[nameSymbol]: ...}. Then, to access a symbol key, we can do user[nameSymbol]. (Trying to access it with user.nameSymbol would have the same problem as before: it would look up the value at the string key 'nameSymbol'.
+
+(Be careful in these examples: we intentionally mix up symbols and strings.)
+
+```js
+// For reference: accessing a key that doesn't exist gives undefined.
+const user = {};
+user.propertyThatDoesntExist;
+RESULT:
+undefined
+```
+
+6.
+```js
+// For reference: accessing a key that doesn't exist gives undefined.
+const user = {};
+user.propertyThatDoesntExist;
+RESULT:
+undefined
+
+const nameSymbol = Symbol('name');
+const user = {[nameSymbol]: 'Amir'};
+user[nameSymbol];
+RESULT:
+'Amir'
+
+const nameSymbol = Symbol('name');
+const user = {[nameSymbol]: 'Amir'};
+user.nameSymbol;
+RESULT:
+undefined
+
+const nameSymbol = Symbol('name');
+const user = {nameSymbol: 'Amir'};
+user[nameSymbol];
+RESULT:
+undefined
+```
+
+Symbol descriptions are usually strings, so it's tempting to think of symbols as just a special kind of string. But that's a mistake! Here's an example of why:
+
+We can use the string 'name' as an object key. We can also use the symbol Symbol('name') as an object key. An object can have both of those keys at once, with each holding a different value!
+
+7.
+```js
+const nameString = 'name';
+const nameSymbol = Symbol('name');
+const user = {
+  [nameString]: 'Amir',
+  [nameSymbol]: 'Betty'
+};
+[user['name'], user[nameSymbol]];
+RESULT:
+['Amir', 'Betty']
+```
+
+The example above hints at why symbols exist. They allow us to add properties to objects without affecting the "normal" properties. We'll see examples of that in future lessons!
 
 ## Lesson 38
 
