@@ -4622,7 +4622,161 @@ RESULT:
 ['Amir', 'Betty']
 ```
 
-## Lesson 36
+## Lesson 36 Modern JavaScript: Computed methods and accessors
+
+We've seen computed properties, where the key of an object is determined dynamically.
+
+1.
+```js
+const loginCounts = {
+  ['Be' + 'tty']: 7
+};
+loginCounts.Betty;
+RESULT:
+7
+```
+
+As usual, this feature exists on classes as well. We can create methods, static methods, accessors, and static accessors, all with computed names. Those names can be built up using any JavaScript expression.
+
+2.
+```js
+let methodName = 'getName';
+
+class User {
+  constructor(name) {
+    this.name = name;
+  }
+
+  [methodName]() {
+    return this.name;
+  }
+}
+
+new User('Amir').getName();
+RESULT:
+'Amir'
+```
+
+3.
+```js
+class User {
+  constructor(name) {
+    this.name = name;
+  }
+
+  get ['user' + 'Name']() {
+    return this.name;
+  }
+}
+
+new User('Betty').userName;
+RESULT:
+'Betty'
+```
+
+4.
+```js
+class User {
+  constructor(name) {
+    this.name = name;
+  }
+
+  static [['get', 'User', 'Name'].join('')](user) {
+    return user.name;
+  }
+}
+
+User.getUserName(new User('Cindy'));
+RESULT:
+'Cindy'
+```
+
+What if we define the class, then change the value that was used to compute a method name? For example, if a method name comes from a variable, we might give that variable a new value.
+
+That won't have any effect: once the class is defined, the computed method names aren't re-evaluated. There are ways to change methods after a class is defined, but computed method names aren't one of them!
+
+(Remember that accessing an object property that doesn't exist will return undefined.)
+
+5.
+```js
+let methodName = 'userName';
+
+class User {
+  constructor(name) {
+    this.name = name;
+  }
+
+  get [methodName]() {
+    return this.name;
+  }
+}
+
+methodName = 'theUserName';
+
+new User('Amir').theUserName;
+RESULT:
+undefined
+```
+
+If the class is created dynamically inside a function, we can use the function's arguments to name the class's accessors and methods.
+
+6.
+```js
+function createUserClass(makeItVerbose) {
+  let methodName;
+  if (makeItVerbose) {
+    methodName = 'theNameOfTheUser';
+  } else {
+    methodName = 'userName';
+  }
+
+  return class {
+    constructor(name) {
+      this.name = name;
+    }
+
+    [methodName]() {
+      return this.name;
+    }
+  };
+}
+
+const TerseUser = createUserClass(false);
+const VerboseUser = createUserClass(true);
+
+[
+  new TerseUser('Amir').userName(),
+  new VerboseUser('Betty').theNameOfTheUser(),
+];
+RESULT:
+['Amir', 'Betty']
+```
+
+Write a function named classWithMethod. It takes one argument: methodName. It returns a class with a method whose name comes from methodName. The method should return `this is ${methodName}`.
+
+7.
+```js
+function classWithMethod(methodName) {
+  return class {
+    [methodName]() {
+      return `this is ${methodName}`;
+    }
+  };
+}
+const methodReturnValues = [
+  new (classWithMethod('aMethod'))().aMethod(),
+  new (classWithMethod('anotherMethod'))().anotherMethod(),
+];
+methodReturnValues;
+GOAL:
+['this is aMethod', 'this is anotherMethod']
+YOURS:
+['this is aMethod', 'this is anotherMethod']
+```
+
+Computed method names are confusing because they break one of our assumptions: "I can look at the class to see what methods it has". Fortunately, they're not used very often!
+
+However, you'll encounter computed methods and accessors eventually, especially in library or framework code that needs to be very generic. When you do encounter them, the rule is relatively simple: when the class is being constructed, the virtual machine evaluates the string to get the method or accessor name. After the class is defined, those names won't change.
 
 ## Lesson 37
 
