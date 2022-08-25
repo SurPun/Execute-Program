@@ -5083,6 +5083,63 @@ This explains why every city thinks that it's only connected to Brussels. The la
 
 This is a big problem: it significantly limits our ability to model complex relationships between data. Fortunately, JavaScript has a solution: the map data type, which we'll see in another lesson coming up soon!
 
-## Lesson 39
+## Lesson 39 Modern JavaScript: Builtin Symbols
+
+JavaScript defines several symbols for us. These are used for metaprogramming, which means "changing the behavior of a program using code". Using these built-in symbols, we can modify how JavaScript runs our code. Here's one example:
+
+By default, calling .toString() on an object results in the string '[object Object]'.
+
+```js
+const anObject = {};
+anObject.toString();
+RESULT:
+'[object Object]'
+```
+
+It doesn't matter what the object contains; it always returns '[object Object]'.
+
+1.
+```js
+const user = {name: 'Dalili'};
+user.toString();
+RESULT:
+'[object Object]'
+```
+
+The string '[object Object]' isn't very informative, but we can change this behavior if we like.
+
+```js
+const anObject = {};
+anObject[Symbol.toStringTag] = 'myObject';
+anObject.toString();
+RESULT:
+'[object myObject]'
+```
+
+We can assign Symbol.toStringTag on an existing object (like above) or we can assign it when the object is first defined (like below).
+
+2.
+```js
+const user = {
+  name: 'Amir',
+  [Symbol.toStringTag]: 'Amir'
+};
+user.toString();
+RESULT:
+'[object Amir]'
+```
+
+In a future lesson, we'll use a built-in symbol to customize for-of loop iteration, allowing regular loops to iterate over our own custom objects as if they were arrays.
 
 ## Lesson 40
+
+## Lesson 41
+
+## Lesson 42
+
+## Lesson 43
+
+## Lesson 44
+
+## Lesson 45
+
