@@ -4954,7 +4954,134 @@ RESULT:
 
 The example above hints at why symbols exist. They allow us to add properties to objects without affecting the "normal" properties. We'll see examples of that in future lessons!
 
-## Lesson 38
+## Lesson 38 Modern JavaScript: Problems with object keys
+
+JavaScript object keys must be strings, numbers, or symbols.
+
+1.
+```js
+const aString = 'aString';
+const aNumber = 5;
+const aSymbol = Symbol('aSymbol');
+const obj = {
+  [aString]: 1,
+  [aNumber]: 2,
+  [aSymbol]: 3,
+};
+[obj[aString], obj[aNumber], obj[aSymbol]];
+RESULT:
+[1, 2, 3]
+```
+
+If we try to use any other value as a key, that value will be converted into a string.
+
+```js
+const obj = {
+  [undefined]: 1,
+};
+Object.keys(obj);
+RESULT:
+['undefined']
+```
+
+Suppose that we want to build a map of train routes: which cities are connected by trains? Here are some European train routes connecting different cities:
+
+London O
+       |            O Antwerp
+       |    Lille   |
+       *------O-----O Brussels
+              |
+              |
+              |
+              O Paris
+
+
+If we represent the cities as strings, then we can track connections with a regular JavaScript object. The keys are city names. The values are arrays of cities that connect directly to the key city.
+
+1.
+```js
+const connections = {
+  'Lille': ['London', 'Paris', 'Brussels'],
+  'London': ['Lille'],
+  'Paris': ['Lille'],
+  'Brussels': ['Lille', 'Antwerp'],
+  'Antwerp': ['Brussels'],
+};
+[
+  connections['Lille'].includes('Paris'),
+  connections['Antwerp'].includes('Paris'),
+];
+RESULT:
+[true, false]
+```
+
+All connections are bidirectional. For example, Brussels connects to Lille and Antwerp, so both of those cities also connect back to Brussels.
+
+This scheme works very well... as long as we represent cities as strings. Now let's complicate things: we want to store additional information about the cities, like their populations. We'll have to make them objects.
+
+```js
+const cities = {
+  lille: {name: 'Lille', population: 232787},
+  london: {name: 'London', population: 8908081},
+  paris: {name: 'Paris', population: 2140526},
+  brussels: {name: 'Brussels', population: 1208542},
+  antwerp: {name: 'Antwerp', population: 523248},
+};
+RESULT:
+undefined
+```
+
+```js
+const connections = {
+  [cities.lille]: [cities.london, cities.paris, cities.brussels],
+  [cities.london]: [cities.lille],
+  [cities.paris]: [cities.lille],
+  [cities.brussels]: [cities.lille, cities.antwerp],
+  [cities.antwerp]: [cities.brussels],
+};
+RESULT:
+undefined
+```
+
+This code looks reasonable. In most other programming languages, it would work. But in JavaScript, it fails in a very confusing way. Let's ask it which cities Lille connects to. (The answer should be London, Paris, and Brussels.)
+
+```js
+connections[cities.lille];
+RESULT:
+[{name: 'Brussels', population: 1208542}]
+```
+
+That's wrong! Our connections object is a regular JavaScript object, so its keys must be strings or symbols. When we use a city object as a key, it's automatically converted into a string via its .toString() method. But the default .toString() method always returns '[object Object]'. All five cities are converted into that string, so the object only has that one string as a key!
+
+```js
+cities.london.toString();
+RESULT:
+'[object Object]'
+
+cities.antwerp.toString();
+RESULT:
+'[object Object]'
+
+Object.keys(connections);
+RESULT:
+['[object Object]']
+```
+
+When we try to look up any city object's connections, the city gets converted into the string '[object Object]' again. We get the same answer no matter which city we ask for.
+
+```js
+connections[cities.london];
+RESULT:
+[{name: 'Brussels', population: 1208542}]
+
+connections[cities.brussels];
+RESULT:
+[{name: 'Brussels', population: 1208542}]
+```
+
+This explains why every city thinks that it's only connected to Brussels. The last key in the object definition was [cities.antwerp]: [cities.brussels], so [cities.brussels] is the final value in the '[object Object]' key.
+
+This is a big problem: it significantly limits our ability to model complex relationships between data. Fortunately, JavaScript has a solution: the map data type, which we'll see in another lesson coming up soon!
 
 ## Lesson 39
 
