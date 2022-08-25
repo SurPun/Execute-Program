@@ -5131,7 +5131,37 @@ RESULT:
 
 In a future lesson, we'll use a built-in symbol to customize for-of loop iteration, allowing regular loops to iterate over our own custom objects as if they were arrays.
 
-## Lesson 40
+## Lesson 40 Modern JavaScript: Symbols are metadata
+
+Before symbols, object property names were always strings, which was nice and simple. Now they can be strings or symbols. Why bother adding this complication?
+
+The answer is that Symbols let us draw an important distinction: symbols are "out of band data", or "metadata". They're not a normal part of the object
+
+For example, when we serialize an object with JSON.stringify, symbol properties are ignored completely. Only the regular string properties are serialized. After round-tripping an object into JSON and back, none of the symbol properties remain.
+
+```js
+const user = {
+  [Symbol.toStringTag]: 'Amir'
+};
+JSON.parse(JSON.stringify(user));
+RESULT:
+{}
+```
+
+1.
+```js
+const user = {
+  name: 'Amir',
+  [Symbol.toStringTag]: 'Amir'
+};
+JSON.parse(JSON.stringify(user));
+RESULT:
+{name: 'Amir'}
+```
+
+This is a very convenient part of symbols. If implementation details like Symbol.toStringTag did show up in JSON, that could cause our API responses to be excessively large, hurting performance. Worse, if we happen to store any sensitive information in symbol properties, then including them in API responses could cause security problems.
+
+Fortunately, neither of those problems occurs because JSON.stringify ignores symbol properties. Other well-behaved data serialization tools will also ignore symbol properties.
 
 ## Lesson 41
 
