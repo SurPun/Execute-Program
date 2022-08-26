@@ -1,6 +1,6 @@
 # JavaScript Arrays
 
-## JavaScript Arrays: Basics
+## Lesson 1 JavaScript Arrays: Basics
 
 This course assumes that you know some basic JavaScript concepts. (You can also look them up as you go; there aren't many!) Here's a list of concepts that we use but don't explain:
 
@@ -55,3 +55,12 @@ strings;
 RESULT:
 ['a', 'b', 'x']
 ```
+
+## Lesson 2
+
+## Lesson 3
+
+## Lesson 4
+
+## Lesson 5
+

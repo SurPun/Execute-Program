@@ -5163,7 +5163,175 @@ This is a very convenient part of symbols. If implementation details like Symbol
 
 Fortunately, neither of those problems occurs because JSON.stringify ignores symbol properties. Other well-behaved data serialization tools will also ignore symbol properties.
 
-## Lesson 41
+## Lesson 41 Modern JavaScript: Defining iterators
+
+We've seen for-of loops:
+
+1.
+```js
+const numbers = [1, 2, 3];
+const times2 = [];
+for (const n of numbers) {
+  times2.push(n * 2);
+}
+times2;
+RESULT:
+[2, 4, 6]
+```
+
+We've also seen for-of loops looping over strings, where the loop iterates over each character in the string:
+
+2.
+```js
+const aString = 'abc';
+const uppercaseLetters = [];
+for (const letter of aString) {
+  uppercaseLetters.push(letter.toUpperCase());
+}
+uppercaseLetters;
+RESULT:
+['A', 'B', 'C']
+```
+
+At a glance, it seems like for-of loops have specific knowledge about arrays and strings. But they don't! Instead, JavaScript defines a more general way to access the elements of a datatype in a particular order. Arrays, strings, and some other data types are "iterables": loops (and other constructs) can iterate over them. ("Iterate" means "perform repeatedly".)
+
+There are rules about how iteration works. The thing being iterated over (like an array, a string, or a custom object that we define) exposes certain methods. Then, the thing doing the iteration (like a for-of loop) calls those methods. As long as both sides agree on what the methods are, the iteration works.
+
+Suppose that we want to iterate over an array called letters. We'll break the process down step by step, with each code example building on the previous one.
+
+First, we get an iterator from the letters array by calling the Symbol.iterator method. (Symbol.iterator is a special symbol defined by the language itself, used only for this purpose.)
+
+```js
+const letters = ['a', 'b', 'c'];
+const iterator = letters[Symbol.iterator]();
+```
+
+The iterator object has a next method. Calling that will give us one element of the array. The element is wrapped up in an object that provides both the element value and a done flag to tell us whether there's more data remaining.
+
+```js
+iterator.next();
+RESULT:
+{done: false, value: 'a'}
+```
+
+Each call to the next method returns the next value from the original array. (Last time it was 'a'. This time, it's 'b'. Next time, it will be 'c'.)
+
+```js
+iterator.next();
+RESULT:
+{done: false, value: 'b'}
+```
+
+3.
+```js
+iterator.next();
+RESULT:
+{done: false, value: 'c'}
+```
+
+Now we've iterated over all three of the letters. If we call next one more time, done will be true and value will be undefined.
+
+4.
+```js
+iterator.next();
+RESULT:
+{done: true, value: undefined}
+```
+
+Our iteration is finished: we got 'a', 'b', and 'c'! To summarize the whole process in English:
+
+1. Get an iterator by calling letters[Symbol.iterator]().
+2. Call the iterator's next method repeatedly.
+3. When next().done is true, stop and throw the iterator away.
+
+Now that we know how iteration works, we can define our own iterable object and our own iterator. We need to provide a method next() that returns an object with keys value and done. This one iterates over all numbers below 3. At the end of this example, we loop over our own object with a for-of loop and it works!
+
+5.
+```js
+class NumbersBelowThree {
+  [Symbol.iterator]() {
+    return new NumberIterator();
+  }
+}
+
+class NumberIterator {
+  constructor() {
+    this.value = 0;
+  }
+  
+  next() {
+    if (this.value < 3) {
+      const value = this.value;
+      this.value += 1;
+      return {value, done: false};
+    } else {
+      return {value: undefined, done: true};
+    }
+  }
+}
+
+const numbers = [];
+for (const n of new NumbersBelowThree()) {
+  numbers.push(n);
+}
+numbers;
+RESULT:
+[0, 1, 2]
+```
+
+Classes are never necessary in JavaScript, so let's repeat the above example without using them. We can define the iterable as a literal object with a Symbol.iterator shorthand method. Instead of a NumberIterator class, we can define a makeIterator function that returns a new iterator object.
+
+6.
+```js
+const numbersBelowThree = {
+  [Symbol.iterator]: () => makeIterator()
+};
+
+function makeIterator() {
+  let currentValue = 0;
+
+  return {
+    next() {
+      const value = currentValue;
+      currentValue += 1;
+
+      if (value < 3) {
+        return {value, done: false};
+      } else {
+        return {value: undefined, done: true};
+      }
+    }
+  };
+}
+
+const numbers = [];
+for (const n of numbersBelowThree) {
+  numbers.push(n);
+}
+numbers;
+RESULT:
+[0, 1, 2]
+```
+
+The class approach and the object approach are both fine. In some situations, one will be a better match than the other. But in many cases, it's a matter of preference, or of choosing what you're more familiar with. Or, if you're updating existing code, it's probably best to work within the existing design, whether it's class-based or object-based.
+
+The examples above both seem like a lot of code for what they do. It's true! We could shorten the code somewhat, but writing iterators manually is always a bit verbose. A future lesson will cover generators, which replace the wordy examples above with a three-line function. But for now, we're focusing on iterators themselves, so we have to deal with the full complexity.
+
+So far, we've avoided some confusing terminology around iterators, but now we'll mention it briefly because it does come up in practice.
+
+The entire process of iterating is governed by the two "iteration protocols". ("Protocol" means "an agreed-upon procedure".)
+
+Protocol 1 is the "iterable protocol". That means that an object has a Symbol.iterator method. Arrays, strings, and our custom objects above follow the iterable protocol.
+
+Protocol 2 is the "iterator protocol". That means that an object has a next method, which in turn returns an object {value, done}. Our NumberIterator class and the object returned by our makeIterator function both follow the iteration protocol. So do the iterators that we get by doing someArray[Symbol.iterator]().
+
+We can think of a for-of loop in terms of the two protocols:
+
+1. It uses the iterable protocol to get a fresh iterator.
+2. It uses the iterator protocol to consume that iterator.
+3. It discards the iterator because it's now used up.
+
+These terms are all confusingly similar: the iterable protocol and iterator protocol combine to make up the iteration protocols. You'll probably mix them up; we definitely mix them up. They're only correct in this lesson because we checked and re-checked the docs many times. This is fine; the important part is how they work, not what they're called!
 
 ## Lesson 42
 
