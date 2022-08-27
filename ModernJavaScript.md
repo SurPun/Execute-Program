@@ -5333,7 +5333,264 @@ We can think of a for-of loop in terms of the two protocols:
 
 These terms are all confusingly similar: the iterable protocol and iterator protocol combine to make up the iteration protocols. You'll probably mix them up; we definitely mix them up. They're only correct in this lesson because we checked and re-checked the docs many times. This is fine; the important part is how they work, not what they're called!
 
-## Lesson 42
+## Lesson 42 Modern JavaScript: Maps
+
+JavaScript objects can only have strings and symbols as keys. But JavaScript's Map data type doesn't have that limitation. It's like an object in that it maps keys to values. But the keys can be anything: arrays, objects, functions, other maps, etc.
+
+We use .set() to assign a value to a key. Then, we can use .get() to retrieve the value at that key.
+
+1.
+```js
+const userEmails = new Map();
+userEmails.set('Amir', 'amir@example.com');
+userEmails.get('Amir');
+RESULT:
+'amir@example.com'
+```
+
+Unlike with objects and arrays, we can't do someMap[someKey]. JavaScript will happily return a value (probably undefined) but it won't be what we want!
+
+We can initialize a map when constructing it. When we do that, we send in an array of two-element arrays. Each of the two-element arrays specifies a key and a value.
+
+2.
+```js
+const userEmails = new Map([
+  ['Amir', 'amir@example.com'],
+  ['Betty', 'betty@example.com']
+]);
+userEmails.get('Betty');
+RESULT:
+'betty@example.com'
+```
+
+Regular JavaScript objects can only have one value at a given key. When we set a key twice, only the last value is remembered.
+
+3.
+```js
+const emails = {};
+emails['Betty'] = 'betty.j@example.com';
+emails['Betty'] = 'betty.k@example.com';
+emails['Betty'];
+RESULT:
+'betty.k@example.com'
+```
+
+Maps work in the same way: setting a key overwrites any existing value at that key.
+
+4.
+```js
+const emails = new Map();
+emails.set('Betty', 'betty.j@example.com');
+emails.set('Betty', 'betty.k@example.com');
+emails.get('Betty');
+RESULT:
+'betty.k@example.com'
+```
+
+We can delete() an individual key; we can clear() the entire map; and the has() method tells us whether a key exists.
+
+5.
+```js
+const emails = new Map([
+  ['Amir', 'amir@example.com'],
+  ['Betty', 'betty@example.com']
+]);
+emails.delete('Amir');
+[emails.has('Amir'), emails.has('Betty')];
+RESULT:
+[false, true]
+
+const emails = new Map();
+emails.set('Cindy', 'cindy@example.com');
+emails.clear();
+emails.set('Dalili', 'dalili@example.com');
+[emails.has('Cindy'), emails.has('Dalili')];
+RESULT:
+[false, true]
+```
+
+When we try to get() a key that doesn't exist, maps do the same thing that objects do: they return undefined.
+
+6.
+```js
+const emails = {
+  Amir: 'amir@example.com'
+};
+emails['Betty'];
+RESULT:
+undefined
+
+const emails = new Map();
+emails.set('Amir', 'amir@example.com');
+emails.get('Betty');
+RESULT:
+undefined
+```
+
+Maps have a size property returning the number of items in the map.
+
+7.
+```js
+const emails = new Map();
+emails.set('Betty', 'betty.j@example.com');
+emails.size;
+RESULT:
+1
+```
+
+Maps' sizes respect the fact that each key can only exist once. When we set a new value for an existing key, the map's size doesn't change.
+
+8.
+```js
+const emails = new Map();
+emails.set('Betty', 'betty.j@example.com');
+emails.set('Betty', 'betty.k@example.com');
+emails.size;
+RESULT:
+1
+```
+
+Now that we have maps, we can return to our problem of tracking train routes. Here's the visual map again:
+
+London O
+       |            O Antwerp
+       |    Lille   |
+       *------O-----O Brussels
+              |
+              |
+              |
+              O Paris
+
+Like before, we define our cities as objects.
+
+```js
+const cities = {
+  lille: {name: 'Lille', population: 232787},
+  london: {name: 'London', population: 8908081},
+  paris: {name: 'Paris', population: 2140526},
+  brussels: {name: 'Brussels', population: 1208542},
+  antwerp: {name: 'Antwerp', population: 523248},
+};
+RESULT:
+undefined
+```
+
+But this time, we store the connections in a map, and everything works!
+
+```js
+const connections = new Map();
+connections.set(cities.lille, [cities.london, cities.paris, cities.brussels]);
+connections.set(cities.london, [cities.lille]);
+connections.set(cities.paris, [cities.lille]);
+connections.set(cities.brussels, [cities.lille, cities.antwerp]);
+connections.set(cities.antwerp, [cities.brussels]);
+RESULT:
+{}
+
+connections.get(cities.london);
+RESULT:
+[{name: 'Lille', population: 232787}]
+
+
+connections.get(cities.lille);
+RESULT:
+[{name: 'London', population: 8908081}, {name: 'Paris', population: 2140526}, {name: 'Brussels', population: 1208542}]
+
+
+connections.get(cities.lille).map(city => city.name);
+RESULT:
+['London', 'Paris', 'Brussels']
+```
+
+9.
+```js
+connections.get(cities.antwerp).map(city => city.name);
+RESULT:
+['Brussels']
+```
+
+We can also get the same result by passing all of the connections to the map constructor at once.
+
+```js
+const connections2 = new Map([
+  [cities.lille, [cities.london, cities.paris, cities.brussels]],
+  [cities.london, [cities.lille]],
+  [cities.paris, [cities.lille]],
+  [cities.brussels, [cities.lille, cities.antwerp]],
+  [cities.antwerp, [cities.brussels]],
+]);
+RESULT:
+{}
+```
+
+10.
+```js
+connections.get(cities.paris).map(city => city.name);
+RESULT:
+['Lille']
+```
+
+Let's add a new city to our map: Rotterdam.
+
+                    O Rotterdam
+London O            |
+       |            O Antwerp
+       |    Lille   |
+       *------O-----O Brussels
+              |
+              |
+              |
+              O Paris
+
+We'll write a connect function that connects two cities by changing the connections map. If a city is already in the map, then we can add to its connection list. But if the city is brand new, we'll have to set() a new array for it in the map.
+
+```js
+function connect(city1, city2) {
+  // Make sure that both cities exist as keys in the map.
+  if (!connections.has(city1)) {
+    connections.set(city1, []);
+  }
+  if (!connections.has(city2)) {
+    connections.set(city2, []);
+  }
+  
+  // Now we know that both cities have connection arrays, so we can add
+  // each city to the other city's array with `push`.
+  connections.get(city1).push(city2);
+  connections.get(city2).push(city1);
+}
+RESULT:
+{}
+
+cities.rotterdam = {name: 'Rotterdam', population: 651446};
+connect(cities.rotterdam, cities.antwerp);
+connections.get(cities.antwerp).map(city => city.name);
+RESULT:
+['Brussels', 'Rotterdam']
+```
+
+11.
+```js
+connections.get(cities.rotterdam).map(city => city.name);
+RESULT:
+['Antwerp']
+```
+
+This kind of data structure is called a graph. Graphs are made of nodes (like cities) and edges (like train routes). Or the nodes can be users in a social network and the edges can mean "is following". Or the nodes can be JavaScript functions and the edges can mean "function 1 calls function 2". If you can draw something as a diagram with boxes connected by lines, then it's a graph!
+
+Execute Program's internal lesson model has a very prominent graph data structure. Our Graph class uses JavaScript's Map to track relationships between lessons, similar to how we've tracked train connections between cities.
+
+Not all Maps are graphs. For example, we might have a Map that maps email addresses to user objects. In that case, we're using the Map more like a table, like in a spreadsheet.
+
+Here's a code problem:
+
+Imagine that we're building a social network. Write a SocialGraph class with two methods. The addFollow method records that user1 follows user2. The follows method checks for whether user1 follows user2, returning a boolean. Create an empty Map in the constructor, then update it whenever addFollow is called.
+
+(Note 1: You can use arrays' includes method to check for whether a user is in another user's follow list.)
+
+(Note 2: unlike a map of train connections, these following relationships are uni-directional. If Amir follows Betty, that doesn't necessarily mean that Betty follows Amir!)
+
+(Note 3: Sometimes follows will be called with a user who follows no one, so they won't have an entry in the map. You'll need to handle that case and return false.)
 
 ## Lesson 43
 
