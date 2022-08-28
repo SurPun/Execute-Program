@@ -5592,6 +5592,65 @@ Imagine that we're building a social network. Write a SocialGraph class with two
 
 (Note 3: Sometimes follows will be called with a user who follows no one, so they won't have an entry in the map. You'll need to handle that case and return false.)
 
+12.
+```js
+class SocialGraph {
+  constructor() {
+    this.map = new Map();
+  }
+​
+  addFollow(user1, user2) {
+    if (!this.map.has(user1)) {
+      this.map.set(user1, []);
+    }
+    this.map.get(user1).push(user2);
+  }
+​
+  follows(user1, user2) {
+    if (!this.map.has(user1)) {
+      return false;
+    } else {
+      return this.map.get(user1).includes(user2);
+    }
+  }
+}
+const amir = 'Amir';
+const betty = 'Betty';
+const cindy = 'Cindy';
+​
+const socialGraph = new SocialGraph();
+socialGraph.addFollow(amir, betty);
+socialGraph.addFollow(amir, cindy);
+socialGraph.addFollow(betty, cindy);
+​
+[
+  socialGraph.follows(amir, betty),
+  socialGraph.follows(amir, cindy),
+  socialGraph.follows(betty, amir),
+  socialGraph.follows(betty, cindy),
+  socialGraph.follows(cindy, amir),
+  socialGraph.follows(cindy, betty),
+];
+GOAL:
+[true, true, false, true, false, false]
+YOURS:
+[true, true, false, true, false, false]
+```
+
+Some final notes about terminology. The Map data type stores a mapping from keys to values. The map method on arrays builds a new array where each element is replaced with ("mapped to") a new value:
+
+```js
+[1, 2, 3].map(n => 2 * n);
+RESULT:
+[2, 4, 6]
+```
+
+The data type Map and the method map are related at the conceptual level: they both "map" (or "relate") things to other things. Other than that, they have no relationship. Their identical names are just an unfortunate accident of history.
+
+Terminology for maps varies by language. Most other languages don't have a distinction between maps and what JavaScript calls "objects". Instead, they have a single data type similar to JavaScript's maps.
+
+This data type is called "map" in JavaScript and Clojure; "dictionary" in Python and C#; and "hash" in Perl and Ruby. Fortunately, these data types all work in a similar way regardless of their names!
+
 ## Lesson 43
 
 ## Lesson 44
