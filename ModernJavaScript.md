@@ -5651,7 +5651,141 @@ Terminology for maps varies by language. Most other languages don't have a disti
 
 This data type is called "map" in JavaScript and Clojure; "dictionary" in Python and C#; and "hash" in Perl and Ruby. Fortunately, these data types all work in a similar way regardless of their names!
 
-## Lesson 43
+## Lesson 43 Modern JavaScript: Iterators
+
+We've covered a lot of background on how iterators work. Now let's see some higher-level details about them.
+
+First up: we've seen that generators and iterables both work with for-of loops. That's because a generator is just a convenient way to define an iterable!
+
+Under the hood, a generator still does all of the usual iterator stuff. Calling the generator gives us an iterable. Calling that iterable's Symbol.iterator method gives us an iterator. Calling the iterator's next method gives us a {value, done} object. We can do all of that directly to see it in action:
+
+```js
+function* loneliestGenerator() {
+  yield 1;
+}
+const iterable = loneliestGenerator();
+const iterator = iterable[Symbol.iterator]();
+iterator.next();
+RESULT:
+{done: false, value: 1}
+
+iterator.next();
+RESULT:
+{done: true, value: undefined}
+```
+
+In practice, you'll write far more generators than manual iterators. But having seen the iteration protocols will make identifying bugs easier, even if you have to look at the docs for the fine details.
+
+Iterators (including generators) can be used by more than just for-of loops. For example, array destructuring syntax will automatically work with any iterable.
+
+1.
+```js
+const letters = ['a', 'b', 'c'];
+const [, b, c] = letters;
+[b, c];
+RESULT:
+['b', 'c']
+
+function* letters() {
+  yield 'a';
+  yield 'b';
+  yield 'c';
+}
+const [, b, c] = letters();
+[b, c];
+RESULT:
+['b', 'c']
+```
+
+Iterators always move forward. Once they've iterated over a value, they can never go back to that value or any earlier values. There's no rewind or restart method.
+
+At first, that seems like an annoying limitation. It is a limitation, and it can be annoying, but it's also central to the purpose of iterators.
+
+Iterators can do two things that plain arrays can't. First, they can iterate over data even if we don't have all of the data yet. For example, if we're receiving data streaming from the network, we can write an iterator that lets us loop over it, even though only a small part of data is on this computer at any given time.
+
+Second, iterators can be infinite in length. Every computer is finite, so we can never have an infinitely large data structure. But iterators produce data only as it's needed, so they can represent infinite sequences of data without ever having to store it all in memory at the same time.
+
+Iterating over streaming network data is difficult to illustrate here. But infinite iterators are much easier. For example, here's an infinite primeNumbers iterator (starting from 2 and going up from there).
+
+2.
+```js
+function* primeNumbers() {
+  let i = 2;
+  
+  while (true) {
+    // All numbers are innocent until proven guilty.
+    let prime = true;
+    
+    /* If this number is divisible by any number less than itself, then
+     * it's not prime. For example, 4 is divisible by 2, so it's not
+     * prime. 5 isn't divisible by 2, 3, or 4, so it is prime.
+     */
+    for (let j=2; j<i; j++) {
+      if (i % j === 0) {
+        prime = false;
+      }
+    }
+
+    if (prime) {
+      yield i;
+    }
+
+    i += 1;
+  }
+}
+const [p1, p2, p3, p4, p5] = primeNumbers();
+[p1, p2, p3, p4, p5];
+RESULT:
+[2, 3, 5, 7, 11]
+```
+
+The primeNumbers contains an infinite loop, so it looks like it will never terminate. But because it's a generator, it will only loop as many times as needed to provide the requested data.
+
+When we destructure an iterator, its next() is called just enough times to get the data being destructured. Our primeNumbers generator's next() was called exactly 5 times. That's why we can destructure 5 numbers (or 10, or 1,000) without locking the browser up in an infinite loop.
+
+An infinite generator will go on for as long as we keep iterating. For example, we can ask primeNumbers for the 100th prime number by iterating over it 100 times, then stopping.
+
+```js
+let count = 0;
+let answer;
+for (const prime of primeNumbers()) {
+  answer = prime;
+  count += 1;
+  if (count === 100) {
+    break;
+  }
+}
+answer;
+RESULT:
+541
+```
+
+We can also write the same thing by manually calling the next() method 100 times.
+
+3.
+```js
+const primes = primeNumbers();
+let answer;
+for (let i=0; i<100; i++) {
+  answer = primes.next().value;
+}
+answer;
+RESULT:
+541
+```
+
+The technical term for all of this is "laziness". Iterators are lazy: they only produce data when it's requested. Laziness is what allows us to iterate over data coming in from the network, or iterate over an infinite list of prime numbers. As long as we only cause a finite number of calls to next(), these iterators will eventually give us an answer.
+
+By contrast, if we did Array.from(primeNumbers()) then it would loop forever while trying to build an array with an infinite number of elements. (It would eventually run out of memory and error.) Likewise for const [first, ...rest] = primeNumbers(). There, the JavaScript virtual machine would try to collect "the rest" of the numbers, but there are infinitely many. (Be careful if you try those examples in a browser's developer console: depending on your browser, it may hang the tab, the window, or the entire application!)
+
+Sometimes, laziness is useful even when we have a finite set of data that's stored on one computer. For example, if we want to examine 1 TB of data stored on the disk, but only have 128 GB of RAM, then we won't be able to load it all up at once. Iterating over it lazily with an iterator gives us the convenient illusion of having it all in RAM simultaneously.
+
+Write an infinite powersOfTwo generator function that yields 1, 2, 4, 8, 16, etc., multiplying by 2 each time.
+
+4.
+```js
+
+```
 
 ## Lesson 44
 
