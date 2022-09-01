@@ -141,7 +141,158 @@ RESULT:
 [1, 2, 'a']
 ```
 
-## Lesson 3
+## Lesson 3 JavaScript Arrays: For each
+
+forEach executes a function once for each element in an array. Let's use it to sum an array of numbers.
+
+1.
+```js
+const nums = [1, 2, 3];
+let sum = 0;
+nums.forEach(num => {
+  sum = sum + num;
+});
+sum;
+RESULT:
+6
+```
+
+In the next example, we want to build a list of peoples' names. We use a for loop to add each name to an array. That requires looking elements up by their indexes i.
+
+2.
+```js
+const people = [
+  {name: 'Amir'},
+  {name: 'Betty'},
+];
+const names = [];
+for (let i=0; i<people.length; i++) {
+  names.push(people[i].name);
+}
+names;
+RESULT:
+['Amir', 'Betty']
+```
+
+forEach lets us write the same code without the index variable i. We pass a function to forEach, which runs the function on each element.
+
+3.
+```js
+const people = [
+  {name: 'Cindy'},
+  {name: 'Dalili'},
+];
+const names = [];
+people.forEach(person => {
+  names.push(person.name);
+});
+names;
+RESULT:
+['Cindy', 'Dalili']
+```
+
+We can modify the array's elements during the forEach.
+
+4.
+```js
+const people = [
+  {name: 'Ebony'},
+  {name: 'Fang'},
+];
+people.forEach(person => {
+  person.name = person.name.toUpperCase();
+});
+people[0].name;
+RESULT:
+'EBONY'
+```
+
+The callback function can reference, and even modify, variables defined in outer scopes. In the next example, the callback function modifies the result variable.
+
+5.
+```js
+const names = ['Gabriel', 'Hana'];
+let result = '';
+names.forEach(name => {
+  result += name;
+});
+result;
+RESULT:
+'GabrielHana'
+```
+
+The second argument to forEach's callback is the item's index.
+
+6.
+```js
+const names = ['Gabriel', 'Hana'];
+const userIDs = [10, 11];
+let result = '';
+names.forEach((name, index) => {
+  result += name + userIDs[index];
+});
+result;
+RESULT:
+'Gabriel10Hana11'
+```
+
+The examples above defined the callback functions inline, at the point where we called forEach. Functions are values in JavaScript, so we can pass them in other ways as well. For example, we can put the function in a variable, then pass the variable to forEach. The following examples define our forEach callback function in different ways, but they all have the same effect.
+
+7.
+```js
+let sum = 0;
+[1, 2, 3, 4].forEach(n => {
+  sum += n;
+});
+sum;
+RESULT:
+10
+
+let sum = 0;
+function addToSum(n) {
+  sum += n;
+}
+[1, 2, 3, 4].forEach(addToSum);
+sum;
+RESULT:
+10
+
+let sum = 0;
+const addToSum = n => sum += n;
+[1, 2, 3, 4].forEach(addToSum);
+sum;
+RESULT:
+10
+```
+
+This function should return true when some of the numbers are positive. Currently it's broken: it always returns false. That's because we tried to return true inside the forEach callback. But the callback's return value is simply thrown away, so that doesn't work.
+
+Modify the function by using the sawPositiveNumber variable that we've already declared for you. Set it to true when a positive number is encountered. Then return it at the end of the hasPositiveNumbers function.
+
+8.
+```js
+function hasPositiveNumbers(numbers) {
+  let sawPositiveNumber = false;
+  numbers.forEach(n => {
+    if (n > 0) {
+      sawPositiveNumber = true;
+    }
+  });
+  return sawPositiveNumber;
+}
+[
+  hasPositiveNumbers([]),
+  hasPositiveNumbers([-2, -1, 0]),
+  hasPositiveNumbers([-1, 0, 100]),
+  hasPositiveNumbers([50]),
+];
+GOAL:
+[false, false, true, true]
+YOURS:
+[false, false, true, true]
+```
+
+Keep that bug in mind! It's easy to make that mistake when using forEach, as well as other array functions that we'll see later like map and reduce.
 
 ## Lesson 4
 
