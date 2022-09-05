@@ -294,7 +294,61 @@ YOURS:
 
 Keep that bug in mind! It's easy to make that mistake when using forEach, as well as other array functions that we'll see later like map and reduce.
 
-## Lesson 4
+## Lesson 4 JavaScript Arrays: Map
+
+map calls a function on each element of an array. It returns a new array of the values returned from those function calls.
+
+1.
+```js
+[1, 2, 3].map(num => num * 10);
+RESULT:
+[10, 20, 30]
+
+['a', 'b', 'c'].map(x => x.toUpperCase());
+RESULT:
+['A', 'B', 'C']
+```
+
+map doesn't change the original array.
+
+2.
+```js
+const nums = [1, 2, 3];
+nums.map(num => num * 10);
+nums[0];
+RESULT:
+1
+```
+
+In a previous lesson, we built an array of people's names using forEach. Here's that example again.
+
+3.
+```js
+const people = [
+  {name: 'Amir'},
+  {name: 'Betty'},
+];
+const names = [];
+people.forEach(person => {
+  names.push(person.name);
+});
+names;
+RESULT:
+['Amir', 'Betty']
+```
+
+There's an easier way. With map, we don't need to create and modify a new array. Instead, we can build the new array directly.
+
+4.
+```js
+const people = [
+  {name: 'Amir'},
+  {name: 'Betty'},
+];
+people.map(person => person.name);
+RESULT:
+['Amir', 'Betty']
+```
 
 ## Lesson 5
 

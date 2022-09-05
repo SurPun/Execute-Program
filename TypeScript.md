@@ -1,4 +1,6 @@
-TypeScript Basics: Basic types
+# TypeScript Basics: Basic
+
+## TypeScript Basics: Basic types
 
 This course covers the TypeScript programming language. TypeScript is a superset of JavaScript, which means that it has all of JavaScript's syntax, plus some new syntax as well.
 
