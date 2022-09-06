@@ -485,7 +485,22 @@ RESULT:
 [1, 2]
 ```
 
-## Lesson 7
+## Lesson 7 JavaScript Arrays: Includes
+
+We can check for whether an array includes a given element.
+
+1.
+```js
+['a', 'b'].includes('c');
+RESULT:
+false
+
+['a', 'b'].includes('a');
+RESULT:
+true
+```
+
+Some methods are mercifully simple to learn.
 
 ## Lesson 8
 
