@@ -847,7 +847,77 @@ RESULT:
 'peas, carrots, and potatoes'
 ```
 
-## Lesson 12
+## Lesson 12 JavaScript Arrays: Index of
+
+We can ask an array for the index of a particular value. (Indexes start at 0, as usual.)
+
+1.
+```js
+const abc = ['a', 'b', 'c'];
+abc.indexOf('a');
+RESULT:
+0
+```
+
+If the value occurs multiple times in the array, we'll get the index of the first occurrence.
+
+2.
+```js
+const abc = ['a', 'b', 'c', 'c'];
+abc.indexOf('c');
+RESULT:
+2
+```
+
+If we ask for an element that isn't in the array, we get -1.
+
+3.
+```js
+const abc = ['a', 'b', 'c'];
+abc.indexOf('d');
+RESULT:
+-1
+```
+
+It's important to check your indexOf calls for that -1 return value! Otherwise you can introduce subtle bugs. Here's an example.
+
+Let's try to slice an array from a certain element forward. We don't check -1 from indexOf, so that -1 might be used as an index. (A hint in case you get stuck: [1, 2, 3].slice(-1) returns [3].)
+
+4.
+```js
+const abc = ['a', 'b', 'c'];
+abc.slice(abc.indexOf('b'));
+RESULT:
+['b', 'c']
+
+const abc = ['a', 'b', 'c'];
+abc.slice(abc.indexOf('c'));
+RESULT:
+['c']
+
+const abc = ['a', 'b', 'c'];
+abc.slice(abc.indexOf('d'));
+RESULT:
+['c']
+```
+
+We can fix that bug by checking for -1.
+
+5.
+```js
+const abc = ['a', 'b', 'c'];
+function sliceFromElement(array, element) {
+  const index = array.indexOf(element);
+  if (index === -1) {
+    return null;
+  } else {
+    return array.slice(index);
+  }
+}
+sliceFromElement(abc, 'd');
+RESULT:
+null
+```
 
 ## Lesson 13
 
