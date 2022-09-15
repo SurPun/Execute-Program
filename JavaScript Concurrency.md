@@ -128,7 +128,76 @@ Those are the basics of callback-based asynchronous programming! The rest of thi
 - Async/await (which are built on top of promises).
 - Asynchronous programming subtleties like error handling and event scheduling.
 
-# Lesson 2
+# Lesson 2 JavaScript Concurrency: setTimeout and functions
+
+setTimeout works in the same way when we wrap our code in functions, classes, or any other language construct.
+
+1.
+```js
+function doAsyncWork() {
+  const array = [];
+  setTimeout(() => array.push('it worked'), 1000);
+  return array;
+}
+const array = doAsyncWork();
+array;
+ ASYNC RESULT:
+['it worked']
+```
+
+As our examples get more complex, we'll want to extract our asynchronous callbacks into their own functions. Here's an example of that: we asynchronously collect users' names in an array.
+
+2.
+```js
+const users = [
+  {name: 'Amir'},
+  {name: 'Betty'},
+];
+
+function addUserName(names, user) {
+  names.push(user.name);
+}
+
+function doAsyncWork() {
+  const names = [];
+  for (const user of users) {
+    setTimeout(() => addUserName(names, user), 1000);
+  }
+  return names;
+}
+
+const array = doAsyncWork();
+array;
+ ASYNC RESULT:
+['Amir', 'Betty']
+```
+
+Extracting callbacks like this makes changing code easier. If we're tracking down a bug where asynchronous code seems to execute in the wrong order, we'll start by looking at doAsyncWork. But if we're fixing a bug in the work itself, we'll start by looking at addUserName.
+
+(Of course, real-world equivalents of addUserName will be more than one line long. Imagine that function being 10 lines long instead of 1!)
+
+Here's a code problem:
+
+Set a timer to call the addMessage function after 100 ms.
+
+(This example uses .slice() to duplicate the messages array's value before any timers run. That lets us check the value of the array before and after the timer fires.)
+
+3.
+```js
+const messages = [];
+function addMessage() {
+  messages.push('It worked!');
+}
+setTimeout(addMessage, 100);
+const initialMessages = messages.slice();
+[initialMessages, messages];
+
+ ASYNC RESULT:
+GOAL:
+[[], ['It worked!']]
+YOURS:
+[[], ['It worked!']]
+```
 
 # Lesson 3
 
