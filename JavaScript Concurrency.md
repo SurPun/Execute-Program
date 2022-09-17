@@ -199,7 +199,128 @@ YOURS:
 [[], ['It worked!']]
 ```
 
-# Lesson 3
+# Lesson 3 JavaScript Concurrency: Concurrent setTimeouts
+
+setTimeout can have a delay of 0, which means "do this immediately". However, it's still asynchronous! Whenever we use a setTimeout with any delay, even 0, the JavaScript engine will finish running all the synchronous code before calling the setTimeout callback.
+
+```js
+console.log('first');
+setTimeout(() => console.log('second'), 0);
+console.log('third');
+
+ async console output
+  37 ms  first
+  38 ms  third
+  42 ms  second
+```
+
+Timers are asynchronous regardless of how many we create. When we create 3 timers, each with a delay of 0, they will only run once the current code finishes. Timers with a delay of 0 will always execute in the order that they were created.
+
+(In this example, remember that 'first' and 'third' will be pushed onto the array before the timers run.)
+
+1.
+```js
+const array = [];
+array.push('first');
+for (const i of [1, 2]) {
+  setTimeout(() => array.push('second ' + i), 0);
+}
+array.push('third');
+array;
+ ASYNC RESULT:
+['first', 'third', 'second 1', 'second 2']
+```
+
+Since the timeout is 0, 'second 1' was pushed to the array immediately after the other code finished running. What happens when we create timers with timeouts greater than 0? Each will fire when its timeout is reached. In the example below, the 'cat' timer will fire before the 'dog' timer.
+
+```js
+setTimeout(() => console.log('cat'), 1000);
+setTimeout(() => console.log('dog'), 2000);
+ async console output
+1017 ms  cat
+2019 ms  dog
+```
+
+The order of the setTimeout calls in the code doesn't matter here. If we switch their order, we'll get the same result: the timer with the shorter delay will fire first.
+
+```js
+setTimeout(() => console.log('dog'), 2000);
+setTimeout(() => console.log('cat'), 1000);
+ async console output
+1007 ms  cat
+2009 ms  dog
+```
+
+In those examples, we logged 'cat' after 1000 ms, then logged 'dog' after 2000 ms. It's important to note that the total execution time was about 2000 ms, not 3000 ms! The timers begin at the same time, and then fire about 1000 ms and 2000 ms from when they were scheduled.
+
+The setTimeout calls below reference DELAY1, DELAY2, and DELAY3 variables that don't exist. Replace those variable references with 100, 200, and 300 to get the timers to run in an order that produces the expected array result.
+
+2.
+```js
+const array = [];
+3
+setTimeout(() => array.push('cat'), 300);
+setTimeout(() => array.push('dog'), 100);
+setTimeout(() => array.push('horse'), 200);
+array;
+ ASYNC RESULT:
+GOAL:
+['dog', 'horse', 'cat']
+YOURS:
+['dog', 'horse', 'cat']
+```
+
+In our examples using console.log, the timing is never quite exact. The next example sets a timer for 1000 ms, but the actual time will be slightly longer when you run it:
+
+```js
+setTimeout(() => console.log('finished'), 1000);
+
+ async console output
+1061 ms  finished
+```
+
+When we set a 1000 ms timer, it means "wait 1000 ms, then call my function as soon as possible." Computers run at finite speeds, so we have no guarantees about how soon our timers will run. If a lot of other code is waiting to run, a 1000 ms timer could take 30 seconds instead of 1 second! (But you won't encounter anything that extreme in most systems.)
+
+We can create that situation artificially by loading the CPU. The next example sets a timer, then runs a "busy loop" for 500 ms: the loop does nothing except take up time. The JavaScript runtime can't execute multiple blocks of code simultaneously, so this prevents it from moving on for about 500 ms.
+
+```js
+const now = () => new Date().getTime();
+const startTime = now();
+
+setTimeout(() => console.log('cat'), 0);
+setTimeout(() => console.log('dog'), 1000);
+
+while (now() < startTime + 500) {
+  // Do nothing; we're wasting 500 ms on purpose.
+}
+
+ async console output
+ 533 ms  cat
+1035 ms  dog
+```
+
+Unless your computer was very busy doing other things, your first console log should have come out around 500 ms. But it was scheduled for 0 ms! That shows that the timer couldn't fire while our 500 ms "busy loop" was running. However, the second setTimeout should have fired at roughly 1000 ms, since there was nothing blocking it.
+
+This brings us to an important point: JavaScript runs one piece of code at a time. (There are some situations where this isn't true, but they're not applicable to this course.) When we write concurrent code, we schedule different code to run at some point in the future, like our console.log calls above. But only one piece of code is actually running at any given time.
+
+This explains why our "0-second" setTimeout took about 500 ms to run. Our setTimeout call told the JavaScript engine to "please run this code as soon as possible." But "as soon as possible" had to wait for our 500 ms busy loop to finish.
+
+The JavaScript engine maintains a queue of timers and other events, processing them in order. We can think of it like this:
+
+```js
+while (true) {
+  for (const timer of eventQueue) {
+    if (timer.isPastItsScheduledTime()) {
+      timer.runCallback();
+      eventQueue.removeTimer(timer);
+    }
+  }
+}
+```
+
+When a timer's callback is fired, it begins, runs, and finishes, all without being interrupted. Then the JavaScript engine checks again. If there are other timers ready, they run.
+
+Real JavaScript engines are more complex than the pseudocode above, but thinking about it in this way will get us surprisingly far!
 
 # Lesson 4
 
